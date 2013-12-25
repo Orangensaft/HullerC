@@ -1,0 +1,18 @@
+Modellgenerator:
+
+-svm-Datensätze einlesen (Trainingsmenge mit +,- Bewertung)
+-huller algorithmus ausführen
+-modell abspeichern (beschreibung der hyperebene(?))
+
+Klassifizierer:
+-svm-Datensätze einlesen (Testmenge ohne +,- Bewertung)
+-Anhand des gegebenen Modells klassifizieren
+-Geeignete Ausgabe der fertigen Klassifizierung
+->Zum Beispiel als SVM-Datensatz mit +,- Bewertung
+
+
+Wenn das erledigt ist:
+-Testen auf Erkennungsrate
+-Speicherlecks beseitigen
+-Testen auf Performanz
+-Eventuelle Optimierung
