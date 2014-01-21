@@ -150,3 +150,10 @@ void test(){
     destroyPoint(p2);
     destroyPoint(p3);
 }
+
+
+// Was passiert, wenn nach dem Erstellen der Ebene ein Wert genau auf der ebene landet? geht das überhaupt? Wie wird dieser klassifiziert?
+// Was ist der a-(alpha)-Wert ?
+// Für was benötigen wir Lambda?
+// Wird zur Vereinfachung auch hier der bias-Wert weggelassen?
+// -- Einlesen der Dateien -- ?
