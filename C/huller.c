@@ -4,12 +4,29 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <assert.h>
+/*
+Wichtige Werte für berechnung:
+Xp  (Vektor)
+Xn  (Vektor)
+XpXp (Skalar)
+XnXp (Skalar)
+XnXn (Skalar)
+*/
 
 typedef struct{
 	float* coords;
 	int dim;
     int class;
 } point;
+
+//Wichtige Daten für Huller
+typedef struct{
+   point *Xp;
+   point *Xn;
+   float XpXp;
+   float XnXp;
+   float XnXn;
+} huller;
 
 point *createPoint(int dim);
 void destroyPoint(point *p);
@@ -43,7 +60,7 @@ void destroyPoint(point *p){
 //skalarprodukt
 float dotP(point *p1, point *p2){
 	assert(p1->dim == p2->dim);
-	float ret;	
+	float ret=0.0;   //zwangsweise initialisieren?	
 	for(int i=0;i<p1->dim;i++){
 		ret+=(p1->coords[i])*(p2->coords[i]);	
 	}	
@@ -81,6 +98,26 @@ point *avgPoints(point *p1, point *p2){
 		p->coords[i]=((p1->coords[i])+(p2->coords[i]))/2;
 	}
     return p;
+}
+
+
+//Konstruktor für Huller
+huller *createHuller(int dim){
+    huller *h = malloc(sizeof(huller));
+    h->Xp = createPoint(dim);
+    h->Xn = createPoint(dim);
+    h->XpXp = 0.0;
+    h->XnXp = 0.0;
+    h->XnXn = 0.0;
+    return h;
+}
+
+
+//Destruktor
+void destroyHuller(huller *h){
+    destroyPoint(h->Xp);
+    destroyPoint(h->Xn);
+    free(h);
 }
 
 //ein paar dinge testen
