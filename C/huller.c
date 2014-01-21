@@ -164,9 +164,14 @@ void test(){
 //gehe von folgender formatierung aus:
 (+|-)1 1:%f 2:%f ... dim:%f
 Wobei Attribute die nicht auftauchen default 0 gesetzt werden
+Bsp:
+-1 3:1 6:1 17:1 27:1 35:1 40:1 57:1 63:1 69:1 73:1 74:1 76:1 81:1 103:1
 */
 void readSamples(char *file,int dim,samples *s){
-    
+    FILE *svmfile = fopen(file,"r");
+    char *buf = malloc(1024*1024); //1MB buffer
+    //fread(buf,1, size_t nmemb,svmfile);   //alternativ open und read?
+    fclose(svmfile);
 }
 
 // Was passiert, wenn nach dem Erstellen der Ebene ein Wert genau auf der ebene landet? geht das überhaupt? Wie wird dieser klassifiziert? -> Egal sowieso falsch, => verwenden zb.
