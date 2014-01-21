@@ -8,6 +8,7 @@
 typedef struct{
 	float* coords;
 	int dim;
+    int class;
 } point;
 
 point *createPoint(int dim);
@@ -39,6 +40,7 @@ point *createPoint(int dim){
 	point *p=malloc(sizeof(point));	//speicher für struct reservieren
 	p->dim=dim;
 	p->coords=malloc(sizeof(float)*dim); //speicher für float-array
+    p->class=0;
 	return p;
 }
 
