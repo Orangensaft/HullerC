@@ -17,21 +17,10 @@ float dotP(point *p1,point *p2);
 point *randomPoint(int dim);
 void printPoint(point *p);
 point *avgPoints(point *p1, point *p2);
+void test();
 
 int main(int argc, char **argv){
-	point *p1 = createPoint(3);
-	p1->coords[0]=0;
-	p1->coords[1]=1;
-	p1->coords[2]=2;
-	point *p2 = createPoint(3);
-	p2->coords[0]=4;
-	p2->coords[1]=2;
-	p2->coords[2]=5;
-	printPoint(p1);
-	printPoint(p2);
-	printf("Skalarprodukt p1,p2 = %f\n",dotP(p1,p2));
-	destroyPoint(p1);
-	destroyPoint(p2);
+    test();
 }
 
 //punkt im dim-dimensionalen raum erstellen
@@ -91,5 +80,36 @@ point *avgPoints(point *p1, point *p2){
 	for(int i=0;i<p1->dim;i++){
 		p->coords[i]=((p1->coords[i])+(p2->coords[i]))/2;
 	}
+    return p;
+}
 
+//ein paar dinge testen
+void test(){
+	point *p1 = createPoint(3);
+	p1->coords[0]=0;
+	p1->coords[1]=1;
+	p1->coords[2]=2;
+	point *p2 = createPoint(3);
+	p2->coords[0]=4;
+	p2->coords[1]=2;
+	p2->coords[2]=5;
+	printPoint(p1);
+	printPoint(p2);
+	printf("Skalarprodukt p1,p2 = %f\n",dotP(p1,p2));
+    printf("Avg p1,p2: \n");
+    point *p3 = avgPoints(p1,p2);
+    printPoint(p3);
+    printf("\n");
+	destroyPoint(p1);
+	destroyPoint(p2);
+    destroyPoint(p3);
+    p1 = randomPoint(10);
+    p2 = randomPoint(10);
+    printPoint(p1);
+    printPoint(p2);
+    p3 = avgPoints(p1,p2);
+    printPoint(p3);
+    destroyPoint(p1);
+    destroyPoint(p2);
+    destroyPoint(p3);
 }
