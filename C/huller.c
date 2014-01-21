@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <time.h>
 #include <assert.h>
 /*
 Wichtige Werte für berechnung:
@@ -37,6 +38,7 @@ point *avgPoints(point *p1, point *p2);
 void test();
 
 int main(int argc, char **argv){
+    srandom((int)time(NULL));
     test();
 }
 
@@ -45,7 +47,7 @@ point *createPoint(int dim){
 	assert(dim>0);
 	point *p=malloc(sizeof(point));	//speicher für struct reservieren
 	p->dim=dim;
-	p->coords=malloc(sizeof(float)*dim); //speicher für float-array
+	p->coords=calloc(dim,sizeof(float)); //speicher für float-array (dim*sizeof(float))
     p->class=0;
 	return p;
 }
@@ -71,7 +73,7 @@ float dotP(point *p1, point *p2){
 point *randomPoint(int dim){
 	point *p=createPoint(dim);
 	for(int i=0;i<dim;i++){
-		p->coords[i]=(float)random();
+		p->coords[i]=(float)(random()/random());
 	}
 	return p;
 }
@@ -152,8 +154,8 @@ void test(){
 }
 
 
-// Was passiert, wenn nach dem Erstellen der Ebene ein Wert genau auf der ebene landet? geht das überhaupt? Wie wird dieser klassifiziert?
-// Was ist der a-(alpha)-Wert ?
-// Für was benötigen wir Lambda?
-// Wird zur Vereinfachung auch hier der bias-Wert weggelassen?
-// -- Einlesen der Dateien -- ?
+// Was passiert, wenn nach dem Erstellen der Ebene ein Wert genau auf der ebene landet? geht das überhaupt? Wie wird dieser klassifiziert? -> Egal sowieso falsch, => verwenden zb.
+// Was ist der a-(alpha)-Wert ?         -> Gewichtung der stützvektoren
+// Für was benötigen wir Lambda?        -> Um neue Gewichtung zu berechnen
+// Wird zur Vereinfachung auch hier der bias-Wert weggelassen? -> Gar nich gefragt?
+// -- Einlesen der Dateien -- ?         -> Anzahl attributwerte gegeben
