@@ -20,6 +20,12 @@ typedef struct{
     int class;
 } point;
 
+//Array aus count vielen Punkten
+typedef struct{
+    int count;
+    point *sample;
+} samples;
+
 //Wichtige Daten für Huller
 typedef struct{
    point *Xp;
@@ -153,6 +159,15 @@ void test(){
     destroyPoint(p3);
 }
 
+/*
+//Samples einlesen -> dim dimensionen maximal.
+//gehe von folgender formatierung aus:
+(+|-)1 1:%f 2:%f ... dim:%f
+Wobei Attribute die nicht auftauchen default 0 gesetzt werden
+*/
+void readSamples(char *file,int dim,samples *s){
+    
+}
 
 // Was passiert, wenn nach dem Erstellen der Ebene ein Wert genau auf der ebene landet? geht das überhaupt? Wie wird dieser klassifiziert? -> Egal sowieso falsch, => verwenden zb.
 // Was ist der a-(alpha)-Wert ?         -> Gewichtung der stützvektoren
