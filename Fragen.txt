@@ -1,0 +1,4 @@
+Gibt es die Möglichkeit Funktionen zu überladen?
+pointAddComp(point *p, [float value])
+Alternativ default Values?
+Nich extrem wichtig aber gut zu wissen
