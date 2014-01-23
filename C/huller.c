@@ -43,14 +43,14 @@ void pointAddComp(point *p,float val);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
-    //testPoint();
+    testPoint();
     //testFile("testinput.svm",150);
-    testAddComp();
+    //testAddComp();
 }
 
 //punkt im dim-dimensionalen raum erstellen
 point *createPoint(int dim){
-	assert(dim>0);
+    assert(dim>=0);
 	point *p=malloc(sizeof(point));	//speicher für struct reservieren
 	p->dim=dim;
 	p->coords=calloc(dim,sizeof(float)); //speicher für float-array (dim*sizeof(float))
@@ -149,10 +149,11 @@ void readSamples(char *file,int dim,samples *s){
     int compLen=0;
     int matches=0;
     int lasthit=0;
-    char *curComp = malloc(100); //aktuelle komponente
+    point *p;
+    char *curComp = malloc(500000); //aktuelle komponente
     char *buf = malloc(500000); //wir wissen nicht wie lang eine zeile maximal werden kann
     while(fgets(buf,500000,svmfile)){ //zeilenweises lesen
-        //*buf ist die aktuelle Zeile, somit aktuelles sample
+        //*buf ist die aktuelle Zeile, somit unser aktueller Punkt
         matches=0; //wir haben noch keine komponenten gefunden
         lasthit=0;
         len=strlen(buf);
@@ -162,12 +163,15 @@ void readSamples(char *file,int dim,samples *s){
             if(buf[i]==' '){
                 matches+=1;
                 if(debug){
-                    printf("Leerzeichen bei %d gefunden. Letzter Treffer war bei %d\n",i,lasthit);
+                    printf("Leerzeichen bei %d gefunden. Letzter Treffer war bei %d\nDas war Treffer %d\n",i,lasthit,matches);
                 }
                 if(matches==1){ //erste komponente gefunden, also die Klassifizierung
-                    strncpy(curComp,buf,i);
-                    //in curComp steht jetzt +%d oder -%d
-                    
+                    if(buf[0]=='+'){ //positives Beispiel
+                        
+                    }
+                    if(buf[0]=='-'){ //negatives Beispiel
+                        
+                    }
                 }
                 lasthit=i;
             }
@@ -177,6 +181,7 @@ void readSamples(char *file,int dim,samples *s){
         
     }
     free(buf);
+    free(curComp);
     fclose(svmfile);
 }
 
@@ -200,7 +205,8 @@ void testFile(char *input,int dim){
 
 //Test der Point-Datenstruktur: konstruktur, destruktor, Skalarprodukt und avg-Operation
 void testPoint(){
-	point *p1 = createPoint(3);
+	point *p1;
+    p1 = createPoint(3);
 	p1->coords[0]=0;
 	p1->coords[1]=1;
 	p1->coords[2]=2;
@@ -227,6 +233,13 @@ void testPoint(){
     destroyPoint(p1);
     destroyPoint(p2);
     destroyPoint(p3);
+    p1 = createPoint(0);
+    printPoint(p1);
+    pointAddComp(p1,0.5);
+    pointAddComp(p1,0.8);
+    pointAddComp(p1,0.4);
+    printPoint(p1);
+    destroyPoint(p1);
 }
 
 void testAddComp(){
