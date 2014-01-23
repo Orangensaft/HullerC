@@ -41,11 +41,11 @@ float dotP(point *p1,point *p2);
 point *randomPoint(int dim);
 void printPoint(point *p);
 point *avgPoints(point *p1, point *p2);
-void test();
+void testPoint();
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
-    test();
+    testPoint();
 }
 
 //punkt im dim-dimensionalen raum erstellen
@@ -128,8 +128,39 @@ void destroyHuller(huller *h){
     free(h);
 }
 
-//ein paar dinge testen
-void test(){
+/*
+//Samples einlesen -> dim dimensionen maximal.
+//gehe von folgender formatierung aus:
+(+|-)1 1:%f 2:%f ... dim:%f
+Wobei Attribute die nicht auftauchen default 0 gesetzt werden
+Bsp:
+-1 3:1 6:1 17:1 27:1 35:1 40:1 57:1 63:1 69:1 73:1 74:1 76:1 81:1 103:1
+*/
+void readSamples(char *file,int dim,samples *s){
+    FILE *svmfile = fopen(file,"r");
+    //fscanf
+    fclose(svmfile);
+}
+
+
+/*
+
+Ab hier nurnoch Testfunktionen um diverse Funktionen und Datenstrukturen zu testen
+
+*/
+
+void testFile(char *input,int dim){
+    //erstmal nur testweise eine leere samplemenge erzeugen
+    samples *s = malloc(sizeof(samples));
+    s->count=0;
+    s->sample=NULL;
+    readSamples(input,dim,s);
+    //TODO: Mit den Samples weiterarbeiten
+}
+
+
+//Test der Point-Datenstruktur: konstruktur, destruktor, Skalarprodukt und avg-Operation
+void testPoint(){
 	point *p1 = createPoint(3);
 	p1->coords[0]=0;
 	p1->coords[1]=1;
@@ -159,20 +190,6 @@ void test(){
     destroyPoint(p3);
 }
 
-/*
-//Samples einlesen -> dim dimensionen maximal.
-//gehe von folgender formatierung aus:
-(+|-)1 1:%f 2:%f ... dim:%f
-Wobei Attribute die nicht auftauchen default 0 gesetzt werden
-Bsp:
--1 3:1 6:1 17:1 27:1 35:1 40:1 57:1 63:1 69:1 73:1 74:1 76:1 81:1 103:1
-*/
-void readSamples(char *file,int dim,samples *s){
-    FILE *svmfile = fopen(file,"r");
-    char *buf = malloc(1024*1024); //1MB buffer
-    //fread(buf,1, size_t nmemb,svmfile);   //alternativ open und read?
-    fclose(svmfile);
-}
 
 // Was passiert, wenn nach dem Erstellen der Ebene ein Wert genau auf der ebene landet? geht das überhaupt? Wie wird dieser klassifiziert? -> Egal sowieso falsch, => verwenden zb.
 // Was ist der a-(alpha)-Wert ?         -> Gewichtung der stützvektoren
