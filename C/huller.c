@@ -247,9 +247,3 @@ void testAddComp(){
        destroyPoint(p);
 }
 
-
-// Was passiert, wenn nach dem Erstellen der Ebene ein Wert genau auf der ebene landet? geht das überhaupt? Wie wird dieser klassifiziert? -> Egal sowieso falsch, => verwenden zb.
-// Was ist der a-(alpha)-Wert ?         -> Gewichtung der stützvektoren
-// Für was benötigen wir Lambda?        -> Um neue Gewichtung zu berechnen
-// Wird zur Vereinfachung auch hier der bias-Wert weggelassen? -> Gar nich gefragt?
-// -- Einlesen der Dateien -- ?         -> Anzahl attributwerte gegeben
