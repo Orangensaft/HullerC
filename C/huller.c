@@ -7,14 +7,6 @@
 #include <assert.h>
 
 #define debug 1
-/*
-Wichtige Werte für berechnung:
-Xp  (Vektor)
-Xn  (Vektor)
-XpXp (Skalar)
-XnXp (Skalar)
-XnXn (Skalar)
-*/
 
 typedef struct{
 	float* coords;
@@ -46,7 +38,8 @@ point *avgPoints(point *p1, point *p2);
 void testPoint();
 void testFile(char *input,int dim);
 void testAddComp();
-void pointAddComp(point *p);
+void pointAddComp(point *p,float val);
+
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -66,10 +59,10 @@ point *createPoint(int dim){
 }
 
 //dem punkt eine Komponente hinzufügen
-void pointAddComp(point *p){
+void pointAddComp(point *p,float val){
     p->coords = realloc(p->coords, sizeof(float)*(p->dim+1));
     p->dim=p->dim+1;
-    p->coords[p->dim-1]=0; //mit 0 initialisieren
+    p->coords[p->dim-1]=val; //mit 0 initialisieren
 }
 
 //punkt freigeben
@@ -242,7 +235,9 @@ void testAddComp(){
        p->coords[0]=1;
        p->coords[1]=2;
        printPoint(p);
-       pointAddComp(p);
+       for(int i=0;i<100;i++){
+           pointAddComp(p,i);
+       }
        printPoint(p);
        destroyPoint(p);
 }
