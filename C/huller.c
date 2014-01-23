@@ -58,7 +58,11 @@ point *createPoint(int dim){
 	return p;
 }
 
-//dem punkt eine Komponente hinzufügen
+/*dem punkt eine Komponente hinzufügen
+dadurch wäre es theoretisch auch möglich einzulesen ohne die Dimension zu kennen.
+->Starte bei Dimension 0. Wenn ein neues Attribut auftaucht (zB. 15:1) die Dimension darauf erhöhen.
+->Das allerdings auch rückwirkend auf alle anderen Punkte. -> Extreme Steigerung der Laufzeit
+*/
 void pointAddComp(point *p,float val){
     p->coords = realloc(p->coords, sizeof(float)*(p->dim+1));
     p->dim=p->dim+1;
@@ -154,7 +158,7 @@ void readSamples(char *file,int dim,samples *s){
     char *buf = malloc(500000); //wir wissen nicht wie lang eine zeile maximal werden kann
     while(fgets(buf,500000,svmfile)){ //zeilenweises lesen
         //*buf ist die aktuelle Zeile, somit unser aktueller Punkt
-        p=createPoint(0); //neuen Null-Dimensionalen Punkt
+        p=createPoint(dim); //neuen Punkt, Dimension ist ja gegeben.
         matches=0; //wir haben noch keine komponenten gefunden
         lasthit=0;
         len=strlen(buf);
