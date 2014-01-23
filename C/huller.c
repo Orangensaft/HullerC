@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+
+#define debug 1
 /*
 Wichtige Werte für berechnung:
 Xp  (Vektor)
@@ -17,7 +19,7 @@ XnXn (Skalar)
 typedef struct{
 	float* coords;
 	int dim;
-    int class;
+    int class; //0 -> -; 1 -> +;
 } point;
 
 //Array aus count vielen Punkten
@@ -42,10 +44,15 @@ point *randomPoint(int dim);
 void printPoint(point *p);
 point *avgPoints(point *p1, point *p2);
 void testPoint();
+void testFile(char *input,int dim);
+void testAddComp();
+void pointAddComp(point *p);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
-    testPoint();
+    //testPoint();
+    //testFile("testinput.svm",150);
+    testAddComp();
 }
 
 //punkt im dim-dimensionalen raum erstellen
@@ -58,6 +65,12 @@ point *createPoint(int dim){
 	return p;
 }
 
+//dem punkt eine Komponente hinzufügen
+void pointAddComp(point *p){
+    p->coords = realloc(p->coords, sizeof(float)*(p->dim+1));
+    p->dim=p->dim+1;
+    p->coords[p->dim-1]=0; //mit 0 initialisieren
+}
 
 //punkt freigeben
 void destroyPoint(point *p){
@@ -132,13 +145,45 @@ void destroyHuller(huller *h){
 //Samples einlesen -> dim dimensionen maximal.
 //gehe von folgender formatierung aus:
 (+|-)1 1:%f 2:%f ... dim:%f
-Wobei Attribute die nicht auftauchen default 0 gesetzt werden
+Wobei Attribute die nicht auftauchenden default 0 gesetzt werden
 Bsp:
--1 3:1 6:1 17:1 27:1 35:1 40:1 57:1 63:1 69:1 73:1 74:1 76:1 81:1 103:1
+-1 3:1 6:1 17:1 27:1 35:1 ...
 */
+//fscanf kann hier nicht verwendet werden weil Zeilen verschiedene viele Einträge haben
 void readSamples(char *file,int dim,samples *s){
-    FILE *svmfile = fopen(file,"r");
-    //fscanf
+    FILE *svmfile = fopen(file,"r");    
+    int len=0;    
+    int compLen=0;
+    int matches=0;
+    int lasthit=0;
+    char *curComp = malloc(100); //aktuelle komponente
+    char *buf = malloc(500000); //wir wissen nicht wie lang eine zeile maximal werden kann
+    while(fgets(buf,500000,svmfile)){ //zeilenweises lesen
+        //*buf ist die aktuelle Zeile, somit aktuelles sample
+        matches=0; //wir haben noch keine komponenten gefunden
+        lasthit=0;
+        len=strlen(buf);
+            if(debug)
+               printf("Länge: %d\n",len);
+        for(int i=0;i<len;i++){
+            if(buf[i]==' '){
+                matches+=1;
+                if(debug){
+                    printf("Leerzeichen bei %d gefunden. Letzter Treffer war bei %d\n",i,lasthit);
+                }
+                if(matches==1){ //erste komponente gefunden, also die Klassifizierung
+                    strncpy(curComp,buf,i);
+                    //in curComp steht jetzt +%d oder -%d
+                    
+                }
+                lasthit=i;
+            }
+        }
+        if(debug)
+            printf("%d Komponenten gefunden\n",matches);
+        
+    }
+    free(buf);
     fclose(svmfile);
 }
 
@@ -156,6 +201,7 @@ void testFile(char *input,int dim){
     s->sample=NULL;
     readSamples(input,dim,s);
     //TODO: Mit den Samples weiterarbeiten
+    free(s);
 }
 
 
@@ -188,6 +234,17 @@ void testPoint(){
     destroyPoint(p1);
     destroyPoint(p2);
     destroyPoint(p3);
+}
+
+void testAddComp(){
+       printf("Test - Komponenten hinzufügen\n");
+       point *p=createPoint(2);
+       p->coords[0]=1;
+       p->coords[1]=2;
+       printPoint(p);
+       pointAddComp(p);
+       printPoint(p);
+       destroyPoint(p);
 }
 
 
