@@ -54,7 +54,7 @@ point *createPoint(int dim){
 	point *p=malloc(sizeof(point));	//speicher für struct reservieren
 	p->dim=dim;
 	p->coords=calloc(dim,sizeof(float)); //speicher für float-array (dim*sizeof(float))
-    p->class=0;
+    p->class=-1;
 	return p;
 }
 
@@ -93,7 +93,7 @@ point *randomPoint(int dim){
 
 //punkt ausgeben zum testen
 void printPoint(point *p){
-	printf("Dimension: %d\n",(int)p->dim);
+	printf("Dimension: %d Klassifizierung: %d\n",(int)p->dim,p->class);
 	printf("<");
 	for(int i=0; i < p->dim; i++){
 		printf("%.2f",p->coords[i]);
@@ -154,6 +154,7 @@ void readSamples(char *file,int dim,samples *s){
     char *buf = malloc(500000); //wir wissen nicht wie lang eine zeile maximal werden kann
     while(fgets(buf,500000,svmfile)){ //zeilenweises lesen
         //*buf ist die aktuelle Zeile, somit unser aktueller Punkt
+        p=createPoint(0); //neuen Null-Dimensionalen Punkt
         matches=0; //wir haben noch keine komponenten gefunden
         lasthit=0;
         len=strlen(buf);
@@ -167,11 +168,13 @@ void readSamples(char *file,int dim,samples *s){
                 }
                 if(matches==1){ //erste komponente gefunden, also die Klassifizierung
                     if(buf[0]=='+'){ //positives Beispiel
-                        
+                        p->class=1;
                     }
                     if(buf[0]=='-'){ //negatives Beispiel
-                        
+                        p->class=0;
                     }
+                }else{ //ab jetzt kommen punkte
+                    //TODO: Die einzelnen Komponenten aus dem String ziehen. Sollte nicht schwer sein, in Ruhe nachdenken!
                 }
                 lasthit=i;
             }
