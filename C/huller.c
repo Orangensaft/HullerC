@@ -146,6 +146,13 @@ Wobei Attribute die nicht auftauchenden default 0 gesetzt werden
 Bsp:
 -1 3:1 6:1 17:1 27:1 35:1 ...
 */
+/*
+Formel für die restlichen Komponenten (noch ungetestet, sollte aber hinhauen. Auch für erste komponente wenn lasthit=-1 zu beginn
+Wortlänge = (neues_leerzeichen - letztes)-1
+Wort = (buf+(letztes+1))
+dementsprechend dann:
+strncpy(wort,buf+lasthit+1,(i-lasthit)-1)
+*/
 //fscanf kann hier nicht verwendet werden weil Zeilen verschiedene viele Einträge haben
 void readSamples(char *file,int dim,samples *s){
     FILE *svmfile = fopen(file,"r");    
