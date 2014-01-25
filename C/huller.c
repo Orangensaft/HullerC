@@ -43,8 +43,8 @@ void pointAddComp(point *p,float val);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
-    testPoint();
-    //testFile("testinput.svm",150);
+    //testPoint();
+    testFile("testinput.svm",150);
     //testAddComp();
 }
 
@@ -146,17 +146,11 @@ Wobei Attribute die nicht auftauchenden default 0 gesetzt werden
 Bsp:
 -1 3:1 6:1 17:1 27:1 35:1 ...
 */
-/*
-Formel für die restlichen Komponenten (noch ungetestet, sollte aber hinhauen. Auch für erste komponente wenn lasthit=-1 zu beginn
-Wortlänge = (neues_leerzeichen - letztes)-1
-Wort = (buf+(letztes+1))
-dementsprechend dann:
-strncpy(wort,buf+lasthit+1,(i-lasthit)-1)
-*/
 //fscanf kann hier nicht verwendet werden weil Zeilen verschiedene viele Einträge haben
 void readSamples(char *file,int dim,samples *s){
     FILE *svmfile = fopen(file,"r");    
     int len=0;    
+    int wlen=0;
     int compLen=0;
     int matches=0;
     int lasthit=0;
@@ -169,8 +163,6 @@ void readSamples(char *file,int dim,samples *s){
         matches=0; //wir haben noch keine komponenten gefunden
         lasthit=0;
         len=strlen(buf);
-            if(debug)
-               printf("Länge: %d\n",len);
         for(int i=0;i<len;i++){
             if(buf[i]==' '){
                 matches+=1;
@@ -185,7 +177,12 @@ void readSamples(char *file,int dim,samples *s){
                         p->class=0;
                     }
                 }else{ //ab jetzt kommen punkte
-                    //TODO: Die einzelnen Komponenten aus dem String ziehen. Sollte nicht schwer sein, in Ruhe nachdenken!
+                    wlen=(i - lasthit)-1;
+                    printf("Länge: %d\n",wlen);
+                    strncpy(curComp,buf+lasthit+1,wlen);
+                    curComp[wlen]='\0';
+                    printf("Komponente: %s\n",curComp);
+                    //TODO: formatiertes einlesen von curComp (sscans(curComp,%d:%f,&dim,&wert)
                 }
                 lasthit=i;
             }
