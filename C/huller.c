@@ -17,7 +17,7 @@ typedef struct{
 //Array aus count vielen Punkten
 typedef struct{
     int count;
-    point *sample;
+    point **sample;  //ein array aus zeigern auf punkte (?)
 } samples;
 
 //Wichtige Daten für Huller
@@ -38,13 +38,17 @@ point *avgPoints(point *p1, point *p2);
 void testPoint();
 void testFile(char *input,int dim);
 void testAddComp();
+void sampleTest();
 void pointAddComp(point *p,float val);
-
+samples* createSamples();
+void sampleAdd(samples* s,point* p);
+void destroySamples(samples* s);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
     //testPoint();
-    testFile("testinput.svm",150);
+    sampleTest();    
+    //testFile("testinput.svm",150);
     //testAddComp();
 }
 
@@ -182,7 +186,7 @@ void readSamples(char *file,int dim,samples *s){
                     strncpy(curComp,buf+lasthit+1,wlen);
                     curComp[wlen]='\0';
                     printf("Komponente: %s\n",curComp);
-                    //TODO: formatiertes einlesen von curComp (sscans(curComp,%d:%f,&dim,&wert)
+                    //TODO: formatiertes einlesen von curComp (sscanf(curComp,%d:%f,&(p->dim),&(p->wert))
                 }
                 lasthit=i;
             }
@@ -196,6 +200,34 @@ void readSamples(char *file,int dim,samples *s){
     fclose(svmfile);
 }
 
+void sampleAdd(samples* s,point* p){
+    s->count=s->count+1;
+    s->sample=realloc(s->sample, (s->count)*sizeof(point));  //nicht größe von *point?
+    s->sample[(s->count)-1]=p;
+}
+
+//samples erstelen (leer)
+samples* createSamples(){
+    samples *s=malloc(sizeof(samples));
+    s->count=0;
+    s->sample=malloc(sizeof(point));
+}
+
+void destroySamples(samples* s){
+    for(int i=0;i<s->count;i++){
+        destroyPoint(s->sample[i]); //einzelnen punkte löschen
+    }  
+    free(s->sample);            //array von zeigern löschen
+    free(s);                //s selbst löschen
+
+}
+
+void printSamples(samples* s){
+    for(int i=0;i<s->count;i++){
+         printPoint(s->sample[i]);
+    }
+
+}
 
 /*
 
@@ -266,3 +298,15 @@ void testAddComp(){
        destroyPoint(p);
 }
 
+void sampleTest(){
+    printf("test - Samples hinzufügen\n\n");
+    point *p2=createPoint(3);
+    p2->coords[0]=1;
+    p2->coords[1]=3;
+    p2->coords[2]=3;
+    p2->class=42;
+    samples *s=createSamples();
+    sampleAdd(s,p2);
+    printSamples(s);
+    destroySamples(s);
+}
