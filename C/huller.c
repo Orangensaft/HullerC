@@ -47,8 +47,8 @@ void destroySamples(samples* s);
 int main(int argc, char **argv){
     srandom((int)time(NULL));
     //testPoint();
-    sampleTest();    
-    //testFile("testinput.svm",150);
+    //sampleTest();    
+    testFile("testinput.svm",150);
     //testAddComp();
 }
 
@@ -158,6 +158,8 @@ void readSamples(char *file,int dim,samples *s){
     int compLen=0;
     int matches=0;
     int lasthit=0;
+    int dimIndex=0;
+    float value=0.0;
     point *p;
     char *curComp = malloc(500000); //aktuelle komponente
     char *buf = malloc(500000); //wir wissen nicht wie lang eine zeile maximal werden kann
@@ -186,11 +188,15 @@ void readSamples(char *file,int dim,samples *s){
                     strncpy(curComp,buf+lasthit+1,wlen);
                     curComp[wlen]='\0';
                     printf("Komponente: %s\n",curComp);
-                    //TODO: formatiertes einlesen von curComp (sscanf(curComp,%d:%f,&(p->dim),&(p->wert))
+                    sscanf(curComp,"%d:%f",&dimIndex,&value);
+                    printf("Dim :%d - Value:%f\n",dimIndex,value);
+                    p->coords[dimIndex]=value;
                 }
                 lasthit=i;
             }
         }
+        //hier punkt zu sample hinzufügen
+        sampleAdd(s,p);
         if(debug)
             printf("%d Komponenten gefunden\n",matches);
         
@@ -226,7 +232,6 @@ void printSamples(samples* s){
     for(int i=0;i<s->count;i++){
          printPoint(s->sample[i]);
     }
-
 }
 
 /*
@@ -235,18 +240,19 @@ Ab hier nurnoch Testfunktionen um diverse Funktionen und Datenstrukturen zu test
 
 */
 
+//datei einlesen -> keine speicherfehler
 void testFile(char *input,int dim){
     //erstmal nur testweise eine leere samplemenge erzeugen
-    samples *s = malloc(sizeof(samples));
-    s->count=0;
-    s->sample=NULL;
+    samples *s = createSamples();
     readSamples(input,dim,s);
+    printSamples(s);
+    destroySamples(s);
     //TODO: Mit den Samples weiterarbeiten
-    free(s);
 }
 
 
 //Test der Point-Datenstruktur: konstruktur, destruktor, Skalarprodukt und avg-Operation
+//--> Keine Speicherfehler
 void testPoint(){
 	point *p1;
     p1 = createPoint(3);
@@ -285,6 +291,7 @@ void testPoint(){
     destroyPoint(p1);
 }
 
+//Komponente zu nem Punkt hinzufügen -->keine speicherfehler
 void testAddComp(){
        printf("Test - Komponenten hinzufügen\n");
        point *p=createPoint(2);
@@ -298,6 +305,8 @@ void testAddComp(){
        destroyPoint(p);
 }
 
+
+//Sample erstellen, füllen und löschen --> keine speicherfehler
 void sampleTest(){
     printf("test - Samples hinzufügen\n\n");
     point *p2=createPoint(3);
