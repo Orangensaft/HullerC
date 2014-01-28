@@ -49,6 +49,7 @@ samples* createSamples();
 void sampleAdd(samples* s,point* p);
 void destroySamples(samples* s);
 void initHuller(huller* h,samples* s);
+void testInit();
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -56,10 +57,11 @@ int main(int argc, char **argv){
         printf("Keine Argumente angegeben; Wechsele in Testmodus\n");
         getchar();
         debug=1;
-        testPoint();
-        sampleTest();    
-        testFile("testinput.svm",150);
-        testAddComp();   
+        //testPoint();
+        //sampleTest();    
+        //testFile("testinput.svm",150);
+       // testAddComp();   
+        testInit();
         exit(EXIT_SUCCESS);
     }
 }
@@ -107,6 +109,7 @@ point *randomPoint(int dim){
 	for(int i=0;i<dim;i++){
 		p->coords[i]=(float)(random()/random());
 	}
+    p->class=random()%2;
 	return p;
 }
 
@@ -278,6 +281,8 @@ void printSamples(samples* s){
     for(int i=0;i<s->count_n;i++){
          printPoint(s->sample_n[i]);
     }
+    printf("Anzahl positive: %d\n",s->count_p);
+    printf("Anzahl negative: %d\n",s->count_n);
 }
 
 /*
@@ -334,6 +339,18 @@ void testAddComp(){
        printPoint(p);
        destroyPoint(p);
        getchar();
+}
+
+void testInit(){
+    printf("\n\nTest - Huller initialisieren\n");
+    huller *h=createHuller(2);
+    samples *s=createSamples();
+    for(int i=0;i<100;i++){
+        sampleAdd(s,randomPoint(2));
+    }
+    printSamples(s);
+    destroySamples(s);
+    destroyHuller(h);
 }
 
 
