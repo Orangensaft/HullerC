@@ -1,8 +1,7 @@
 Modellgenerator:
 
--svm-Datensätze einlesen (Trainingsmenge mit +,- Bewertung)
 -huller algorithmus ausführen
--modell abspeichern (beschreibung der hyperebene(?))
+-modell abspeichern (beschreibung der hyperebene)
 
 Klassifizierer:
 -svm-Datensätze einlesen (Testmenge ohne +,- Bewertung)
