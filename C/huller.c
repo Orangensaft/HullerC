@@ -6,7 +6,7 @@
 #include <time.h>
 #include <assert.h>
 
-#define debug 1
+int debug=0;
 
 typedef struct{
 	float* coords;
@@ -46,10 +46,16 @@ void destroySamples(samples* s);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
-    //testPoint();
-    //sampleTest();    
-    testFile("testinput.svm",150);
-    //testAddComp();
+    if(argc==1){
+        printf("Keine Argumente angegeben; Wechsele in Testmodus\n");
+        getchar();
+        debug=1;
+        testPoint();
+        sampleTest();    
+        testFile("testinput.svm",150);
+        testAddComp();   
+        exit(EXIT_SUCCESS);
+    }
 }
 
 //punkt im dim-dimensionalen raum erstellen
@@ -184,12 +190,15 @@ void readSamples(char *file,int dim,samples *s){
                     }
                 }else{ //ab jetzt kommen punkte
                     wlen=(i - lasthit)-1;
-                    printf("Länge: %d\n",wlen);
+                    if(debug)
+                        printf("Länge: %d\n",wlen);
                     strncpy(curComp,buf+lasthit+1,wlen);
                     curComp[wlen]='\0';
-                    printf("Komponente: %s\n",curComp);
+                    if(debug)
+                        printf("Komponente: %s\n",curComp);
                     sscanf(curComp,"%d:%f",&dimIndex,&value);
-                    printf("Dim :%d - Value:%f\n",dimIndex,value);
+                    if(debug)                    
+                        printf("Dim :%d - Value:%f\n",dimIndex,value);
                     p->coords[dimIndex]=value;
                 }
                 lasthit=i;
@@ -242,11 +251,13 @@ Ab hier nurnoch Testfunktionen um diverse Funktionen und Datenstrukturen zu test
 
 //datei einlesen -> keine speicherfehler
 void testFile(char *input,int dim){
+    printf("\n\nTeste Dateieinlesen\n\n");
     //erstmal nur testweise eine leere samplemenge erzeugen
     samples *s = createSamples();
     readSamples(input,dim,s);
     printSamples(s);
     destroySamples(s);
+    getchar();
     //TODO: Mit den Samples weiterarbeiten
 }
 
@@ -254,6 +265,7 @@ void testFile(char *input,int dim){
 //Test der Point-Datenstruktur: konstruktur, destruktor, Skalarprodukt und avg-Operation
 //--> Keine Speicherfehler
 void testPoint(){
+    printf("\n\nTeste Punkte\n\n");
 	point *p1;
     p1 = createPoint(3);
 	p1->coords[0]=0;
@@ -289,11 +301,12 @@ void testPoint(){
     pointAddComp(p1,0.4);
     printPoint(p1);
     destroyPoint(p1);
+    getchar();
 }
 
 //Komponente zu nem Punkt hinzufügen -->keine speicherfehler
 void testAddComp(){
-       printf("Test - Komponenten hinzufügen\n");
+       printf("\n\nTest - Komponenten hinzufügen\n\n");
        point *p=createPoint(2);
        p->coords[0]=1;
        p->coords[1]=2;
@@ -303,19 +316,26 @@ void testAddComp(){
        }
        printPoint(p);
        destroyPoint(p);
+       getchar();
 }
 
 
 //Sample erstellen, füllen und löschen --> keine speicherfehler
 void sampleTest(){
-    printf("test - Samples hinzufügen\n\n");
+    printf("\n\nTest - Samples hinzufügen\n\n");
+    point *p1=createPoint(3);
+    p1->coords[0]=5;
+    p1->coords[1]=6;
+    p1->coords[2]=2;    
     point *p2=createPoint(3);
     p2->coords[0]=1;
     p2->coords[1]=3;
     p2->coords[2]=3;
     p2->class=42;
     samples *s=createSamples();
+    sampleAdd(s,p1);
     sampleAdd(s,p2);
     printSamples(s);
     destroySamples(s);
+    getchar();
 }
