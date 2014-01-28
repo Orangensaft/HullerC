@@ -173,7 +173,6 @@ void readSamples(char *file,int dim,samples *s){
     FILE *svmfile = fopen(file,"r");    
     int len=0;    
     int wlen=0;
-    int compLen=0;
     int matches=0;
     int lasthit=0;
     int dimIndex=0;
