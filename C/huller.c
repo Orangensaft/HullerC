@@ -5,6 +5,9 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+//Konstanten
+//Anzahl der Punkte die für die Initialisierung genutzt werden
+#define AVGCOUNT = 10
 
 int debug=0;
 
@@ -16,8 +19,10 @@ typedef struct{
 
 //Array aus count vielen Punkten
 typedef struct{
-    int count;
-    point **sample;  //ein array aus zeigern auf punkte (?)
+    int count_p;
+    int count_n;
+    point **sample_p;  //ein array aus zeigern auf punkte (?)
+    point **sample_n; //negative beispiele
 } samples;
 
 //Wichtige Daten für Huller
@@ -64,7 +69,7 @@ point *createPoint(int dim){
 	point *p=malloc(sizeof(point));	//speicher für struct reservieren
 	p->dim=dim;
 	p->coords=calloc(dim,sizeof(float)); //speicher für float-array (dim*sizeof(float))
-    p->class=-1;
+    p->class=0;
 	return p;
 }
 
@@ -138,6 +143,13 @@ huller *createHuller(int dim){
     h->XnXp = 0.0;
     h->XnXn = 0.0;
     return h;
+}
+
+void initHuller(huller* h){
+   //TODO: avg von ein paar positiven und negativen punkten bilden
+   //TODO: Xp, Xn, XpXp, XnXp, XnXn berechnen
+        
+
 }
 
 
@@ -216,30 +228,47 @@ void readSamples(char *file,int dim,samples *s){
 }
 
 void sampleAdd(samples* s,point* p){
-    s->count=s->count+1;
-    s->sample=realloc(s->sample, (s->count)*sizeof(point));  //nicht größe von *point?
-    s->sample[(s->count)-1]=p;
+    if(p->class==0){ //Negativ
+        s->count_n=s->count_n+1;
+        s->sample_n=realloc(s->sample_n, (s->count_n)*sizeof(point));  //nicht größe von *point?  
+        s->sample_n[(s->count_n)-1]=p; 
+    }else{  //positiv
+        s->count_p=s->count_p+1;
+        s->sample_p=realloc(s->sample_p, (s->count_p)*sizeof(point));
+        s->sample_p[(s->count_p)-1]=p;    
+    }
 }
 
 //samples erstelen (leer)
 samples* createSamples(){
     samples *s=malloc(sizeof(samples));
-    s->count=0;
-    s->sample=malloc(sizeof(point));
+    s->count_n=0;
+    s->count_p=0;
+    s->sample_n=malloc(sizeof(point));
+    s->sample_p=malloc(sizeof(point));
 }
 
 void destroySamples(samples* s){
-    for(int i=0;i<s->count;i++){
-        destroyPoint(s->sample[i]); //einzelnen punkte löschen
+    for(int i=0;i<s->count_n;i++){
+        destroyPoint(s->sample_n[i]); //einzelnen punkte löschen
     }  
-    free(s->sample);            //array von zeigern löschen
+    for(int i=0;i<s->count_p;i++){
+        destroyPoint(s->sample_p[i]);
+    }
+    free(s->sample_n);            //array von zeigern löschen
+    free(s->sample_p);    
     free(s);                //s selbst löschen
 
 }
 
 void printSamples(samples* s){
-    for(int i=0;i<s->count;i++){
-         printPoint(s->sample[i]);
+    printf("Positive Beispiele:\n");
+    for(int i=0;i<s->count_p;i++){
+         printPoint(s->sample_p[i]);
+    }
+    printf("Negative Beispiele:\n");
+    for(int i=0;i<s->count_n;i++){
+         printPoint(s->sample_n[i]);
     }
 }
 
