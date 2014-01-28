@@ -7,7 +7,7 @@
 #include <assert.h>
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
-#define AVGCOUNT 10
+#define AVGCOUNT 5
 
 int debug=0;
 
@@ -50,6 +50,8 @@ void sampleAdd(samples* s,point* p);
 void destroySamples(samples* s);
 void initHuller(huller* h,samples* s);
 void testInit();
+void pointCopy(point* dest, point* src);
+void pointAdd(point *p1, point *p2);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -140,27 +142,59 @@ void avgPoints(point *p1, point *p2){
 huller *createHuller(int dim){
     huller *h = malloc(sizeof(huller));
     h->Xp = createPoint(dim);
+    (h->Xp)->class=1;
     h->Xn = createPoint(dim);
+    (h->Xn)->class=0;
     h->XpXp = 0.0;
     h->XnXp = 0.0;
     h->XnXn = 0.0;
     return h;
 }
 
+//punkt kopieren -> komponentenweise
+void pointCopy(point* dest, point* src){
+    assert(dest->dim == src->dim);
+    for(int i=0;i<dest->dim;i++){
+        dest->coords[i]=src->coords[i];
+    }
+}
+
+//p1 = p1+p2;
+void pointAdd(point *p1, point *p2){
+    assert(p1->dim==p2->dim);
+    for(int i=0;i<p1->dim;i++){
+        p1->coords[i] += p2->coords[i];
+    }
+}
+
+//Punkt durch n Teilen
+void pointDiv(point *p1,float n){
+    for(int i=0;i<p1->dim;i++){
+           p1->coords[i]=(p1->coords[i])/n;
+     }
+}
+
 void initHuller(huller* h,samples* s){
-   //TODO: avg von ein paar positiven und negativen punkten bilden
    //TODO: Xp, Xn, XpXp, XnXp, XnXn berechnen
+   //TODO: Durchschnitt von Punkten berechnen. Immer nur mit zweierpärchen funktioniert nicht! (0+0+0+0+1)/4   != (0+1)/2
    //Avg von Punkten berechnen
    int k=0;
+   point *tmp = createPoint((s->sample_p[0])->dim);
    for(int i=0;i<AVGCOUNT;i++){
         k=random()%(s->count_p);
-        avgPoints(h->Xp,s->sample_p[k]);
-    }   //--> XP
+        pointAdd(tmp,s->sample_p[k]); //Punkt aufaddieren
+    }   //--> in tmp liegt jetzt die summe der punkte
+    pointDiv(tmp,AVGCOUNT);
+    pointCopy(h->Xp,tmp);
+    destroyPoint(tmp);
+    tmp = createPoint((s->sample_n[0])->dim);
     for(int i=0;i<AVGCOUNT;i++){
         k=random()%(s->count_n);
-        avgPoints(h->Xn,s->sample_n[k]);
-    }     //--> XN
-
+        pointAdd(tmp,s->sample_n[k]);
+    }     //--> in n liegt jetzt die summe der punkte
+    pointDiv(tmp,AVGCOUNT);
+    pointCopy(h->Xn,tmp);
+    destroyPoint(tmp);
 }
 
 
@@ -198,7 +232,7 @@ void readSamples(char *file,int dim,samples *s){
         lasthit=0;
         len=strlen(buf);
         for(int i=0;i<len;i++){
-            if(buf[i]==' '){
+            if(buf[i]==' '){  //mit /n
                 matches+=1;
                 if(debug){
                     printf("Leerzeichen bei %d gefunden. Letzter Treffer war bei %d\nDas war Treffer %d\n",i,lasthit,matches);
@@ -240,11 +274,11 @@ void readSamples(char *file,int dim,samples *s){
 void sampleAdd(samples* s,point* p){
     if(p->class==0){ //Negativ
         s->count_n=s->count_n+1;
-        s->sample_n=realloc(s->sample_n, (s->count_n)*sizeof(point));  //nicht größe von *point?  
+        s->sample_n=realloc(s->sample_n, (s->count_n)*sizeof(point*));  //
         s->sample_n[(s->count_n)-1]=p; 
     }else{  //positiv
         s->count_p=s->count_p+1;
-        s->sample_p=realloc(s->sample_p, (s->count_p)*sizeof(point));
+        s->sample_p=realloc(s->sample_p, (s->count_p)*sizeof(point*));
         s->sample_p[(s->count_p)-1]=p;    
     }
 }
@@ -254,8 +288,8 @@ samples* createSamples(){
     samples *s=malloc(sizeof(samples));
     s->count_n=0;
     s->count_p=0;
-    s->sample_n=malloc(sizeof(point));
-    s->sample_p=malloc(sizeof(point));
+    s->sample_n=malloc(sizeof(point*));
+    s->sample_p=malloc(sizeof(point*));
     return s;
 }
 
@@ -349,6 +383,12 @@ void testInit(){
         sampleAdd(s,randomPoint(2));
     }
     printSamples(s);
+    printf("|P|=%d |N|=%d\n",s->count_p,s->count_n);
+    initHuller(h,s);
+    printf("Startwert Xp:\n");
+    printPoint(h->Xp);
+    printf("Startwert Xn:\n");
+    printPoint(h->Xn);
     destroySamples(s);
     destroyHuller(h);
 }
