@@ -1,0 +1,65 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 Menlo-Regular;}
+{\colortbl;\red255\green255\blue255;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww15020\viewh14720\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc
+
+\f0\fs24 \cf0 Zwischenstandsmeldung\
+Gruppe: \'82sparc\'91\
+Mitglieder: Nicolas Meisberger und Robin Franzke\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural
+\cf0 \
+Wie schon im Projektplan beschrieben, soll der Algorithmus Huller implementiert werden. Dieser liest, grob beschrieben, eine Trainingsmenge ein, welche Objekte enth\'e4lt, welche jeweils n-viele Attribute aufweisen.\
+Diese n-Attribute k\'f6nnen in einem n-Dimensionalen-Feld bzw. in einem n-Dimensionalen-Vektor repr\'e4sentiert werden. Ziel ist es, negativ und positiv deklarierte Punkte zu separieren und jeweils eine \'84Menge\'93 der jeweiligen Punkte zu bilden. Ist dies geschehen, soll eine Hyperebene bzgl. deren Median-Werte gelegt werden, sodass neue eingelesene Objekte bzw. Testmengen dann vom Algorithmus als negativ oder positiv deklariert werden k\'f6nnen.\
+\
+Unser Algorithmus ist nun wie folgt aufgebaut:\
+\
+- Wir haben bereits eine \'82struct\'91 \'84Point\'93 zur Repr\'e4sentation der Vektoren implementiert\
+Ausserdem haben wir die dazugeh\'f6rige Datenstruktur, ein Array mit Zeigern (genannt, struct \'84samples\'93) implementiert, was wie gesagt, einem Array aus \'84count\'93-vielen Punkten gleicht.\
+\
+- Da wir im HULLER-Algorithmus Medianwerte ausrechnen m\'fcssen, m\'fcssen wir folgende Punkte beachten:\
+\
+			
+\f1\fs22 \CocoaLigature0 point *Xp;\
+\pard\tx529\pardeftab529\pardirnatural
+\cf0    			 point *Xp;\
+  			 point *Xn;\
+   			 float XpXp;\
+			 float XnXp;\
+  			 float XnXn;\
+\
+Diese Punkte werden von uns ebenfalls in einer struct-Deklaration repr\'e4sentiert. (genannt, \'84huller\'93)\
+\
+- Nun zu den bereits implementierten Funktionen\
+	- Wir k\'f6nnen mit der Funktion \'84*createPoint\'93 einen Punkt im \'84dim\'93-Dimensionalen Raum erstellen, wobei \'84dim\'93 die Anzahl der n-Attribute der Objekte sind. Daf\'fcr alloziieren/reservieren wir Speicher f\'fcr das struct \'84point\'93 sowie f\'fcr das \'84Float-Array\'93 \'82samples\'91. Voraussetzung ist hier, dass der \'84dim\'93-Wert bzw. die Dimension gr\'f6\'dfergleich als 0 sein muss, damit man ihn \'fcberhaupt darstellen kann.\
+	- Weiterhin implementierten wir eine Funktion \'84pointAddComp\'93, welche als Parameter einen Pointer *p bzgl. unserer struct \'84point\'93 hat, sowie einen float-Wert val. Diese Funktion weist einem Punkt im \'84dim\'93-Vektorraum eine Komponente hinzu, wodurch es theoretische m\'f6glich w\'e4re, ein Objekt aus der Testmenge einzulesen ohne die dazugeh\'f6rige Dimension zu kennen. Wir haben dadurch jedoch eine extreme Steigerung der Laufzeit.\
+	- Ebenso implementierten wir Funktionen wie \'84destroyPoint(point *p)\'93 und \'84dotP\'93, welche den alloziierten Speicher eines Punktes wieder freigibt bzw. das Skalarprodukt von 2 Vektoren bilden. (Hierbei ist zu beachten, dass man einen initialisierten float-Wert = 0.0 setzen muss, um sp\'e4tere Probleme abzufangen.\
+	- \'84randomPoint\'93 erstellt uns per Zufallszahl einen zuf\'e4lligen Punkt und gibt diesen durch \'84return p;\'93 zur\'fcck. Diese Funktion ist lediglich zum Testen der allgemeinen HULLER-Funktion implementiert worden.\
+	- \'84printPoint\'93 ist die dazugeh\'f6rige \'84print\'93-Funktion bzw. gibt uns den eingelesenen Punkt aus und klassifiziert ihn im Terminal mit der dazugeh\'f6rigen Dimension sowie Klassifizierung.\
+	- Wie oben beschrieben m\'fcssen wir eine Hyperebene durch die 2 (positiv oder negativ) klassifizierten Punktemengen legen. Daf\'fcr brauchen wie die \'84median\'93-Werte der beiden Mengen bzw. Durchschnittswerte. Genau daf\'fcr ist die Funktion \'84*avgPoints\'93 zust\'e4ndig, welche zwei Vektoren einlesen und deren Durchschnitt bilden kann.\
+	- Ein grundlegender Konstruktor sowie Destruktor f\'fcr Huller ist ebenso bereits implementiert. Der Konstruktor initialisiert die oben aufgef\'fchrten Punkte (XpXp, XnXp, XnXn) anf\'e4nglich jeweils mit 0.0 und erstellt die dazugeh\'f6rigen Punkte mit der Funktion \'84createPoint\'93 (Xp und Xn) mit deren dazugeh\'f6rigen Dimension als Parameter. Wichtig hierbei ist die \'84malloc\'93-Funktion, welche Speicher dynamisch bzgl. der Gr\'f6\'dfe von \'84huller\'93 alloziiert.\
+	- unsere Funktion \'84readSamples\'93 kann bereits Testmengen einlesen. Wir gehen hier von folgender Formatierung der Testobjekte in unserer Testmenge aus:\
+	(+|-)1 1:%f 2:%f ... dim:%f\
+	Wobei Attribute die nicht auftauchen mit deinem Default-Werte = 0 gesetzt werden. Beispielobjekte sehen wie folgt aus: -1 3:1 6:1 17:1 27:1 35:1 ...\
+Unsere Funktion arbeitet nicht mit \'84fscanf\'93, da diese hier nicht verwendet werden kann, weil die Zeilen unserer Testmenge jeweils verschieden viele Eintr\'e4ge haben k\'f6nnen. Da wir nicht wissen k\'f6nnen, wie lang eine Zeile aus der Testmenge werden kann, reservieren wir dynamisch Speicher f\'fcr diese wie folgt: malloc(500000).\
+	- In unserem ProgrammCode sind gegen Ende noch diverse Funktionen wie \'84testFile\'93 oder \'84testPoint\'93 oder \'84testAddComp\'93 implementiert, welche nicht von Relevanz bzgl. des Huller-Algorithmus\'92 sind, da diese nur f\'fcr Testzwecke f\'fcr uns dienen. Diese testen beispielsweise unserer \'84Haupt\'93-Funktionen auf Funktionalit\'e4t.\
+\
+\
+\pard\tx529\pardeftab529\pardirnatural\qc
+\cf0 Noch ungel\'f6ste/offene \'84Probleme\'93\
+\pard\tx529\pardeftab529\pardirnatural
+\cf0 \
+Wir m\'fcssen noch aufbauend auf unser \'84Grundger\'fcst\'93, was bis jetzt erfolgreich implementiert wurde, folgende Funktionen implementieren:\
+	- Das Lernprogramm, was aus unserer eingelesenen Testmenge ein Modell erstellt. (Separierung der Objekt-Attribute (positiv,negativ,etc, \'85 )\
+	- Der Klassifizierer, welcher das erstellte Modell nimmt sowie einen weiteren Datensatz und diese Daten anhand dem Modell klassifiziert.\
+\
+Orientiert an unserem Projektplan sieht das wie folgt aus:\
+		Offene \'84Probleme\'93:\
+\
+						 Lernprogramm:\
+								- Modell erstellen\
+						 Klassifizierer:\
+								- Modell einlesen\
+								- Klassifizierung\
+								- Klassifizierte Datens\'e4tze ausgeben}
