@@ -61,9 +61,9 @@ int main(int argc, char **argv){
         debug=1;
         //testPoint();
         //sampleTest();    
-        //testFile("testinput.svm",150);
+        testFile("testinput.svm",150);
        // testAddComp();   
-        testInit();
+        //testInit();
         exit(EXIT_SUCCESS);
     }
 }
@@ -258,6 +258,24 @@ void readSamples(char *file,int dim,samples *s){
                     p->coords[dimIndex]=value;
                 }
                 lasthit=i;
+            }if(buf[i]=='\n'){      //Abfrage für \n am ende.
+                if(lasthit==i-1){
+                    //nix tun, direkt davor kam ein lerzeichen, zeile ist also zu ende.
+                }else{
+                    printf("\\n gefunden ohne leerzeichen davor! :O\n");
+                    wlen=(i - lasthit)-1;
+                    if(debug)
+                        printf("Länge: %d\n",wlen);
+                    strncpy(curComp,buf+lasthit+1,wlen);
+                    curComp[wlen]='\0';
+                    if(debug)
+                        printf("Komponente: %s\n",curComp);
+                    sscanf(curComp,"%d:%f",&dimIndex,&value);
+                    if(debug)                    
+                        printf("Dim :%d - Value:%f\n",dimIndex,value);
+                    p->coords[dimIndex]=value; 
+                }
+
             }
         }
         //hier punkt zu sample hinzufügen
