@@ -147,12 +147,16 @@ huller *createHuller(int dim){
 void initHuller(huller* h,samples* s){
    //TODO: avg von ein paar positiven und negativen punkten bilden
    //TODO: Xp, Xn, XpXp, XnXp, XnXn berechnen
-    int k=0;
-    int j=0;
+   //Avg von Punkten berechnen
+   int k=0;
    for(int i=0;i<AVGCOUNT;i++){
         k=random()%(s->count_p);
-        j=random()%(s->count_p);        
-    }
+        avgPoints(h->Xp,s->sample_p[k]);
+    }   //--> XP
+    for(int i=0;i<AVGCOUNT;i++){
+        k=random()%(s->count_n);
+        avgPoints(h->Xn,s->sample_n[k]);
+    }     //--> XN
 
 }
 
@@ -307,6 +311,11 @@ void testPoint(){
     p2->coords[0]=5;
     p2->coords[1]=10;
     p2->coords[2]=15;
+    printPoint(p1);
+    printPoint(p2);
+    avgPoints(p1,p2);
+    printf("Avg der beiden:\n");
+    printPoint(p1);
     destroyPoint(p1);
     destroyPoint(p2);
     getchar();
