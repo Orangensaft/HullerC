@@ -244,9 +244,7 @@ void printSamples(samples* s){
 }
 
 /*
-
 Ab hier nurnoch Testfunktionen um diverse Funktionen und Datenstrukturen zu testen
-
 */
 
 //datei einlesen -> keine speicherfehler
