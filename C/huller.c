@@ -52,6 +52,7 @@ void initHuller(huller* h,samples* s);
 void testInit();
 void pointCopy(point* dest, point* src);
 void pointAdd(point *p1, point *p2);
+void updateScalars(huller *h);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -61,9 +62,9 @@ int main(int argc, char **argv){
         debug=1;
         //testPoint();
         //sampleTest();    
-        testFile("testinput.svm",150);
+        //testFile("testinput.svm",150);
        // testAddComp();   
-        //testInit();
+        testInit();
         exit(EXIT_SUCCESS);
     }
 }
@@ -176,7 +177,6 @@ void pointDiv(point *p1,float n){
 
 void initHuller(huller* h,samples* s){
    //TODO: Xp, Xn, XpXp, XnXp, XnXn berechnen
-   //TODO: Durchschnitt von Punkten berechnen. Immer nur mit zweierpärchen funktioniert nicht! (0+0+0+0+1)/4   != (0+1)/2
    //Avg von Punkten berechnen
    int k=0;
    point *tmp = createPoint((s->sample_p[0])->dim);
@@ -195,6 +195,14 @@ void initHuller(huller* h,samples* s){
     pointDiv(tmp,AVGCOUNT);
     pointCopy(h->Xn,tmp);
     destroyPoint(tmp);
+    //Xp und Xn stehen jetzt. Jetzt noch Skalare berechen.
+    updateScalars(h);
+}
+
+void updateScalars(huller *h){
+h->XpXp=dotP(h->Xp,h->Xp);
+h->XnXp=dotP(h->Xn,h->Xp);
+h->XnXn=dotP(h->Xn,h->Xn);
 }
 
 
@@ -408,6 +416,7 @@ void testInit(){
     printf("Startwert Xn:\n");
     printPoint(h->Xn);
     destroySamples(s);
+    printf("XpXp: %f XnXp: %f XnXn: %f\n",h->XpXp,h->XnXp,h->XnXn);
     destroyHuller(h);
 }
 
