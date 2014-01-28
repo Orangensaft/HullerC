@@ -7,7 +7,7 @@
 #include <assert.h>
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
-#define AVGCOUNT = 10
+#define AVGCOUNT 10
 
 int debug=0;
 
@@ -39,7 +39,7 @@ void destroyPoint(point *p);
 float dotP(point *p1,point *p2);
 point *randomPoint(int dim);
 void printPoint(point *p);
-point *avgPoints(point *p1, point *p2);
+void avgPoints(point *p1, point *p2);
 void testPoint();
 void testFile(char *input,int dim);
 void testAddComp();
@@ -48,6 +48,7 @@ void pointAddComp(point *p,float val);
 samples* createSamples();
 void sampleAdd(samples* s,point* p);
 void destroySamples(samples* s);
+void initHuller(huller* h,samples* s);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -124,13 +125,11 @@ void printPoint(point *p){
 }
 
 //durchschnitt zwischen 2 punkten errechnen
-point *avgPoints(point *p1, point *p2){
+void avgPoints(point *p1, point *p2){
 	assert(p1->dim==p2->dim);	
-	point *p=createPoint(p1->dim);
 	for(int i=0;i<p1->dim;i++){
-		p->coords[i]=((p1->coords[i])+(p2->coords[i]))/2;
+		p1->coords[i]=((p1->coords[i])+(p2->coords[i]))/2;
 	}
-    return p;
 }
 
 
@@ -145,10 +144,15 @@ huller *createHuller(int dim){
     return h;
 }
 
-void initHuller(huller* h){
+void initHuller(huller* h,samples* s){
    //TODO: avg von ein paar positiven und negativen punkten bilden
    //TODO: Xp, Xn, XpXp, XnXp, XnXn berechnen
-        
+    int k=0;
+    int j=0;
+   for(int i=0;i<AVGCOUNT;i++){
+        k=random()%(s->count_p);
+        j=random()%(s->count_p);        
+    }
 
 }
 
@@ -306,7 +310,7 @@ void testPoint(){
 	printPoint(p2);
 	printf("Skalarprodukt p1,p2 = %f\n",dotP(p1,p2));
     printf("Avg p1,p2: \n");
-    point *p3 = avgPoints(p1,p2);
+    point *p3 = createPoint(3);
     printPoint(p3);
     printf("\n");
 	destroyPoint(p1);
@@ -316,7 +320,7 @@ void testPoint(){
     p2 = randomPoint(10);
     printPoint(p1);
     printPoint(p2);
-    p3 = avgPoints(p1,p2);
+    avgPoints(p1,p2);
     printPoint(p3);
     destroyPoint(p1);
     destroyPoint(p2);
