@@ -246,6 +246,7 @@ samples* createSamples(){
     s->count_p=0;
     s->sample_n=malloc(sizeof(point));
     s->sample_p=malloc(sizeof(point));
+    return s;
 }
 
 void destroySamples(samples* s){
