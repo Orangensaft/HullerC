@@ -184,6 +184,9 @@ void pointDiv(point *p1,float n){
 }
 
 //Huller initialisieren
+//Die Summe der alpha i (für positive) und alpha j (für negative) muss 1 sein
+//-> alpha_i = 1/count_p
+//-> alpha_j = 1/count_n
 void initHuller(huller* h,samples* s){
    //Avg von Punkten berechnen
    int k=0;
@@ -205,6 +208,13 @@ void initHuller(huller* h,samples* s){
     destroyPoint(tmp);
     //Xp und Xn stehen jetzt. Jetzt noch Skalare berechen.
     updateScalars(h);
+    //alpha startwerte erstellen: (Damit Summe_alpha = 1 gilt.)
+    for(int i=0;i<s->count_p;i++){
+       s->sample_p[i]->alpha = 1/s->count_p;
+    }
+    for(int i=0;i<s->count_n;i++){
+       s->sample_n[i]->alpha = 1/s->count_n;
+    }
 }
 
 //Huller updaten
@@ -217,6 +227,7 @@ void updateHuller(huller* h, samples* s,point* xn){
     //lambda ausrechnen
     //alpha i updaten für die gilt: klassifizeriung xn = klassifizierung i (alpha_i=(1-lambda)*alpha_i)
     //alpha von xk updaten (alpha_xk = alpha_xk + lambda)  
+    //XpXp XnXp XnXn Updaten
 
 }
 

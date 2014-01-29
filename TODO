@@ -4,10 +4,10 @@ Modellgenerator:
 -modell abspeichern (beschreibung der hyperebene)
 
 Klassifizierer:
--svm-Datensätze einlesen (Testmenge ohne +,- Bewertung)
--Anhand des gegebenen Modells klassifizieren
--Geeignete Ausgabe der fertigen Klassifizierung
-->Zum Beispiel als SVM-Datensatz mit +,- Bewertung
+-svm-Datensätze einlesen (Testmenge ohne +,- Bewertung) //kein problem, class wird einfach ignoriert und dann überprüft ob der punkt richtig liegt
+-Anhand des gegebenen Modells klassifizieren            //punkte einlesen und mit ebene vergleichen (wie?)
+-Geeignete Ausgabe der fertigen Klassifizierung         //Anzahl der Punkte die positiv und die der negativ sind ausgeben bzw. auflisten (>stdout>txt-datei)
+->Zum Beispiel als SVM-Datensatz mit +,- Bewertung      //Im Grunde einfach möglich, nur die Printfunktion muss angepasst werden
 
 
 Wenn das erledigt ist:
