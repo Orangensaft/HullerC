@@ -59,6 +59,7 @@ void pointAdd(point *p1, point *p2);
 void updateScalars(huller *h);
 void mainHuller(huller* h, samples* s);
 void updateHuller(huller* h, samples* s,point* xn);
+point* randPoint(samples* s);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -67,10 +68,10 @@ int main(int argc, char **argv){
         getchar();
         debug=1;
         //testPoint();
-        //sampleTest();    
+        sampleTest();    
         //testFile("testinput.svm",150);
        // testAddComp();   
-        testInit();
+        //testInit();
         exit(EXIT_SUCCESS);
     }
 }
@@ -182,6 +183,7 @@ void pointDiv(point *p1,float n){
      }
 }
 
+//Huller initialisieren
 void initHuller(huller* h,samples* s){
    //Avg von Punkten berechnen
    int k=0;
@@ -205,6 +207,7 @@ void initHuller(huller* h,samples* s){
     updateScalars(h);
 }
 
+//Huller updaten
 void updateHuller(huller* h, samples* s,point* xn){
     //Xp.xn berechnen
     //Xn.xn berechnen
@@ -217,6 +220,22 @@ void updateHuller(huller* h, samples* s,point* xn){
 
 }
 
+//Aus einem Sample einen zufälligen Punkt ziehen (kann positiv oder negativ sein)
+//Gibt pointer auf punkt zurück.
+point* randPoint(samples* s){
+    int k=0;    
+    k=random()%2; //positiver oder negativer punkt?
+    if(k==0){
+     k=random()%(s->count_n);
+     return (s->sample_n[k]);   
+    }
+    else{
+      k=random()%(s->count_p);
+      return (s->sample_p[k]);
+    }
+}
+
+//Haupte Hullerschleife
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
     for(int i=0;i<MAXITERATIONS;i++){
@@ -227,6 +246,7 @@ void mainHuller(huller* h, samples* s){
     }
 }
 
+//Skalare von Huller updaten (nur im init genutzt)
 void updateScalars(huller *h){
 h->XpXp=dotP(h->Xp,h->Xp);
 h->XnXp=dotP(h->Xn,h->Xp);
@@ -325,6 +345,7 @@ void readSamples(char *file,int dim,samples *s){
     fclose(svmfile);
 }
 
+//Punkt zu sample hinzufügen
 void sampleAdd(samples* s,point* p){
     if(p->class==0){ //Negativ
         s->count_n=s->count_n+1;
@@ -347,6 +368,7 @@ samples* createSamples(){
     return s;
 }
 
+//destruktor von sample
 void destroySamples(samples* s){
     for(int i=0;i<s->count_n;i++){
         destroyPoint(s->sample_n[i]); //einzelnen punkte löschen
@@ -360,6 +382,7 @@ void destroySamples(samples* s){
 
 }
 
+//sample ausgebeb
 void printSamples(samples* s){
     printf("Positive Beispiele:\n");
     for(int i=0;i<s->count_p;i++){
@@ -428,7 +451,7 @@ void testAddComp(){
        destroyPoint(p);
        getchar();
 }
-
+//init von Huller testen
 void testInit(){
     printf("\n\nTest - Huller initialisieren\n");
     huller *h=createHuller(2);
@@ -452,19 +475,16 @@ void testInit(){
 //Sample erstellen, füllen und löschen --> keine speicherfehler
 void sampleTest(){
     printf("\n\nTest - Samples hinzufügen\n\n");
-    point *p1=createPoint(3);
-    p1->coords[0]=5;
-    p1->coords[1]=6;
-    p1->coords[2]=2;    
-    point *p2=createPoint(3);
-    p2->coords[0]=1;
-    p2->coords[1]=3;
-    p2->coords[2]=3;
-    p2->class=42;
     samples *s=createSamples();
-    sampleAdd(s,p1);
-    sampleAdd(s,p2);
+    for(int i=0;i<100;i++){
+        sampleAdd(s,randomPoint(3));
+    }
     printSamples(s);
+    getchar();
+    printf("\n\nJetzt ein paar zufällige Punkte aus Samples:\n\n");
+    for(int i=0;i<10;i++){
+        printPoint(randPoint(s));
+    }    
     destroySamples(s);
     getchar();
 }
