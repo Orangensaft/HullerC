@@ -7,7 +7,10 @@
 #include <assert.h>
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
-#define AVGCOUNT 5
+#define AVGCOUNT 10
+//Maximale Anzahl der Iterationen
+#define MAXITERATIONS 100000
+// je größer desto genauer
 
 int debug=0;
 
@@ -54,6 +57,8 @@ void testInit();
 void pointCopy(point* dest, point* src);
 void pointAdd(point *p1, point *p2);
 void updateScalars(huller *h);
+void mainHuller(huller* h, samples* s);
+void updateHuller(huller* h, samples* s,point* xn);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -198,6 +203,28 @@ void initHuller(huller* h,samples* s){
     destroyPoint(tmp);
     //Xp und Xn stehen jetzt. Jetzt noch Skalare berechen.
     updateScalars(h);
+}
+
+void updateHuller(huller* h, samples* s,point* xn){
+    //Xp.xn berechnen
+    //Xn.xn berechnen
+    //xn.xn berechnen
+    //fallunterscheidung ob positiv oder negativ
+    //->lambda u berechnen
+    //lambda ausrechnen
+    //alpha i updaten für die gilt: klassifizeriung xn = klassifizierung i (alpha_i=(1-lambda)*alpha_i)
+    //alpha von xk updaten (alpha_xk = alpha_xk + lambda)  
+
+}
+
+void mainHuller(huller* h, samples* s){
+    initHuller(h,s);    //Huller initialisieren
+    for(int i=0;i<MAXITERATIONS;i++){
+        //Zufälliger punkt mit alpha = 0 suchen
+        //Punkt updaten
+        //Zufälligen punkt mit alpha != 0 suchen
+        //Punkt updaten
+    }
 }
 
 void updateScalars(huller *h){
