@@ -451,7 +451,7 @@ void testAddComp(){
        destroyPoint(p);
        getchar();
 }
-//init von Huller testen
+//init von Huller testen./bu    
 void testInit(){
     printf("\n\nTest - Huller initialisieren\n");
     huller *h=createHuller(2);
