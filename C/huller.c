@@ -15,6 +15,7 @@ typedef struct{
 	float* coords;
 	int dim;
     int class; //0 -> -; 1 -> +;
+    float alpha;
 } point;
 
 //Array aus count vielen Punkten
@@ -76,6 +77,7 @@ point *createPoint(int dim){
 	p->dim=dim;
 	p->coords=calloc(dim,sizeof(float)); //speicher für float-array (dim*sizeof(float))
     p->class=0;
+    p->alpha=0;
 	return p;
 }
 
@@ -176,7 +178,6 @@ void pointDiv(point *p1,float n){
 }
 
 void initHuller(huller* h,samples* s){
-   //TODO: Xp, Xn, XpXp, XnXp, XnXn berechnen
    //Avg von Punkten berechnen
    int k=0;
    point *tmp = createPoint((s->sample_p[0])->dim);
