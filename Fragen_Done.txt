@@ -3,3 +3,9 @@
 // Für was benötigen wir Lambda?        -> Um neue Gewichtung zu berechnen
 // Wird zur Vereinfachung auch hier der bias-Wert weggelassen? -> Gar nich gefragt?
 // -- Einlesen der Dateien -- ?         -> Anzahl attributwerte gegeben
+
+
+Gibt es die Möglichkeit Funktionen zu überladen?
+pointAddComp(point *p, [float value])
+Alternativ default Values?
+Nich extrem wichtig aber gut zu wissen              ->NEIN
