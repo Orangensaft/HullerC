@@ -60,6 +60,10 @@ void updateScalars(huller *h);
 void mainHuller(huller* h, samples* s);
 void updateHuller(huller* h, samples* s,point* xn);
 point* randPoint(samples* s);
+void completeTest();
+float max(float a, float b);
+float min(float a, float b);
+void prettyPrint(point* p);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -68,10 +72,11 @@ int main(int argc, char **argv){
         getchar();
         debug=1;
         //testPoint();
-        sampleTest();    
+        //sampleTest();    
         //testFile("testinput.svm",150);
        // testAddComp();   
         //testInit();
+        completeTest();        
         exit(EXIT_SUCCESS);
     }
 }
@@ -217,18 +222,57 @@ void initHuller(huller* h,samples* s){
     }
 }
 
+float min(float a, float b){
+    if(a<=b){
+        return a;
+    }else{
+    return b;
+    }
+}
+
+float max(float a, float b){
+    if(a>=b){
+        return a;
+    }else{
+        return b;
+    }
+}
+
+
+
 //Huller updaten
 void updateHuller(huller* h, samples* s,point* xn){
-    //Xp.xn berechnen
-    //Xn.xn berechnen
-    //xn.xn berechnen
-    //fallunterscheidung ob positiv oder negativ
-    //->lambda u berechnen
-    //lambda ausrechnen
-    //alpha i updaten für die gilt: klassifizeriung xn = klassifizierung i (alpha_i=(1-lambda)*alpha_i)
-    //alpha von xk updaten (alpha_xk = alpha_xk + lambda)  
-    //XpXp XnXp XnXn Updaten
-
+    float Xpxn = dotP(h->Xp,xn);
+    float Xnxn = dotP(h->Xn,xn);
+    float xnxn = dotP(xn,xn);
+    float alpha_k = xn->alpha;
+    float lambda_u=0.0;
+    float lambda = 0.0;    
+    if(xn->class==0){ //negativ Gleichung 5
+        lambda_u = ((h->XnXn)-(h->XnXp)-Xnxn+Xpxn)/((h->XnXn)+xnxn-2*Xnxn);
+    }else{  //positiv  Gleichung 4
+        lambda_u = ((h->XpXp)-(h->XnXp)-Xpxn+Xnxn)/((h->XpXp)+xnxn-2*Xpxn);
+    }
+    lambda = min(1,max((-(xn->alpha))/(1-(xn->alpha)),lambda_u)); //lambda berechnen
+    if(xn->class==0){
+        for(int i=0;i<s->count_n;i++){
+            s->sample_n[i]->alpha=(1-lambda)*s->sample_n[i]->alpha;  //alpha_i = (1-l)*alpha_i
+        }
+    }else{
+       for(int i=0;i<s->count_p;i++){
+            s->sample_p[i]->alpha=(1-lambda)*s->sample_p[i]->alpha;  //das selbe nur für positiv
+        }
+    }
+    xn->alpha = alpha_k+lambda;     //alpha vorm aktuellen punkt updaten
+    if(xn->class==1){ //Update XpXp XnXp XnXn -> Gleichungen 7
+        h->XpXp = (1-lambda)*(1-lambda)*(h->XpXp)+2*lambda*(1-lambda)*Xpxn+lambda*lambda*xnxn;
+        h->XnXp = (1-lambda)*(h->XnXp)+lambda*Xnxn;
+      //h->XnXn = h->XnXn
+    }else{ //Update XpXp XnXp XnXn -> Gleichungen 8
+      //h->XpXp = h->XpXp
+        h->XnXp = (1-lambda)*(h->XnXp)+lambda*Xpxn;
+        h->XnXn = (1-lambda)*(1-lambda)*(h->XnXn)+2*lambda*(1-lambda)*Xnxn+lambda*lambda*xnxn;
+    }
 }
 
 //Aus einem Sample einen zufälligen Punkt ziehen (kann positiv oder negativ sein)
@@ -250,10 +294,31 @@ point* randPoint(samples* s){
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
     for(int i=0;i<MAXITERATIONS;i++){
-        //Zufälliger punkt mit alpha = 0 suchen
-        //Punkt updaten
-        //Zufälligen punkt mit alpha != 0 suchen
-        //Punkt updaten
+        point* p=randPoint(s);
+        while(p->alpha!=0){  //Solange random bis wir einen punkt mit alpha=0 finden
+            p=randPoint(s);
+        }
+        updateHuller(h,s,p); //Update auf Punkt starten
+        point* r=randPoint(s);
+        while(p->alpha==0){  //Zufälligen punkt mit alpha != 0 suchen
+            r=randPoint(s);
+        }
+        updateHuller(h,s,r); //Update auf Punkt starten
+    }
+    //funktion ausgeben
+    printf("\ny(x)=(");
+    prettyPrint(h->Xp);
+    printf("-");
+    prettyPrint(h->Xn);
+    printf(")x+%f-%f)/2\n",h->XnXn,h->XpXp);
+
+}
+
+void prettyPrint(point* p){
+    for(int i=0;i<(p->dim);i++){
+        printf("%f",(p->coords[i]));
+        if(i!=(p->dim-1))
+            printf(",");
     }
 }
 
@@ -498,4 +563,21 @@ void sampleTest(){
     }    
     destroySamples(s);
     getchar();
+}
+
+//Eine richtige svm Datei einlesen und Dinge damit anstellen
+//Erkennt alle 1605 Punkte. 395 Positiv, 1210 negativ //zeit < 1ns
+void completeTest(){
+    printf("\n\n 'Richtiger' test\n\n");
+    //debug ausschalten
+    //debug=0;
+    //struct timespec time_before, time_after;
+    samples *s=createSamples();
+    //clock_gettime(CLOCK_MONOTONIC, &time_before);
+    readSamples("a1a.svm",123,s);
+    //clock_gettime(CLOCK_MONOTONIC, &time_after);
+    printSamples(s);
+    destroySamples(s);
+   // printf("Dauer für das Einlesen von 1605 Samples: %f\n",(time_after.tv_sec - time_before.tv_sec)*(1000000000l) + (time_after.tv_nsec - time_before.tv_nsec));
+
 }
