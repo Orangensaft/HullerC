@@ -177,17 +177,18 @@ point *randomPoint(int dim){
 }
 
 
-//punkt ausgeben zum testen
+//punkt ausgeben zum testen und zum speichern der samples.
 void printPoint(point *p){
-	printf("Dimension: %d Klassifizierung: %d\n",(int)p->dim,p->class);
-	printf("<");
+	//printf("Dimension: %d Klassifizierung: %d\n",(int)p->dim,p->class);
+	//printf("<");
+    if(p->class==0)
+        printf("-1 ");
+    if(p->class==1)
+        printf("+1 ");
 	for(int i=0; i < p->dim; i++){
-		printf("%.2f",p->coords[i]);
-		if(i!=(p->dim)-1){
-			printf(",");
-		}
+		printf("%f ",p->coords[i]);
 	}
-	printf(">\n");
+	printf("\n");
 }
 
 //durchschnitt zwischen 2 punkten errechnen
@@ -506,18 +507,14 @@ void destroySamples(samples* s){
 
 }
 
-//sample ausgebeb
+//sample ausgeben
 void printSamples(samples* s){
-    printf("Positive Beispiele:\n");
     for(int i=0;i<s->count_p;i++){
          printPoint(s->sample_p[i]);
     }
-    printf("Negative Beispiele:\n");
     for(int i=0;i<s->count_n;i++){
          printPoint(s->sample_n[i]);
     }
-    printf("Anzahl positive: %d\n",s->count_p);
-    printf("Anzahl negative: %d\n",s->count_n);
 }
 
 /*
