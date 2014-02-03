@@ -51,12 +51,15 @@ void sampleTest();
 void pointAddComp(point *p,float val);
 samples* createSamples();
 void sampleAdd(samples* s,point* p);
+void readSamples(char *file,int dim,samples *s);
 void destroySamples(samples* s);
 void initHuller(huller* h,samples* s);
 void testInit();
 void pointCopy(point* dest, point* src);
 void pointAdd(point *p1, point *p2);
 void updateScalars(huller *h);
+void destroyHuller(huller *h);
+huller *createHuller(int dim);
 void mainHuller(huller* h, samples* s);
 void updateHuller(huller* h, samples* s,point* xn);
 point* randPoint(samples* s);
@@ -64,6 +67,8 @@ void completeTest();
 float max(float a, float b);
 float min(float a, float b);
 void prettyPrint(point* p);
+void classify(char* svmfile, char* hulfile,int dim);
+void learn(char* svmfile,int dim);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -78,7 +83,49 @@ int main(int argc, char **argv){
         //testInit();
         completeTest();        
         exit(EXIT_SUCCESS);
+    }  
+    if(argc==4){
+            if(strcmp(argv[1],"learn")==0){
+                learn(argv[2],atoi(argv[3]));
+                exit(EXIT_SUCCESS); 
+            }
     }
+    if(argc==5){
+            if(strcmp(argv[1],"classify")==0){
+                classify(argv[2],argv[3],atoi(argv[4]));
+                exit(EXIT_SUCCESS);
+            }
+    }
+    printf("Anwendung: huller learn SVM-File #attribute\n");
+    printf("Oder:      huller classify SVM-File hullerfile #attribute\n");
+    exit(EXIT_SUCCESS);    
+}
+
+void learn(char* svmfile, int dim){
+    huller *h=createHuller(dim);
+    samples *s=createSamples();
+    readSamples(svmfile,dim,s);
+    printf("Samples eingelesen. Starte Huller\n");
+    mainHuller(h,s);
+    printf("Huller fertig.\n");
+    //TODO: Huller als Datei speichern. (Jede Zeile eine Zahl oder durch # trennen in eine Zeile.) Im zweifel stdout, dann in Datei umleiten
+    destroyHuller(h);
+    destroySamples(s);
+
+}
+
+void classify(char* svmfile, char* hulfile,int dim){
+    huller *h=createHuller(dim);
+    samples *s=createSamples();
+    /*TODO: Samples einlesen (was für eine Dateiformatierung? mit +- am anfang oder ohne?)
+            Hullerdatei öffnen und daraus huller erstellen
+            Samples durchgehen skalarprodukt mit ebene bilden (?) dementsprechend Klassifizierung ausgeben
+            Punkte dann vlt in einer Datei Klassifiziert speichert. (Im Zweifel einfach im Stdout ausgeben, das kann ein eine Datei umgeleitet werden)
+            //
+       
+    */
+    destroyHuller(h);
+    destroySamples(s);
 }
 
 //punkt im dim-dimensionalen raum erstellen
@@ -294,6 +341,7 @@ point* randPoint(samples* s){
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
     for(int i=0;i<MAXITERATIONS;i++){
+        printf("Generation: %d\n",i);
         point* p=randPoint(s);
         while(p->alpha!=0){  //Solange random bis wir einen punkt mit alpha=0 finden
             p=randPoint(s);
