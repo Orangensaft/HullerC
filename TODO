@@ -1,6 +1,6 @@
 Modellgenerator:
 
--huller algorithmus ausführen
+-Startwert für Alphas herausfinden
 -modell abspeichern (beschreibung der hyperebene)
 
 Klassifizierer:
