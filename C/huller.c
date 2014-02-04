@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
+#include <math.h>
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
 #define AVGCOUNT 10
@@ -67,8 +68,10 @@ void completeTest();
 float max(float a, float b);
 float min(float a, float b);
 void prettyPrint(point* p);
+void printSamples(samples* s);
 void classify(char* svmfile, char* hulfile,int dim);
 void learn(char* svmfile,int dim);
+void printHuller(huller *h);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -105,9 +108,10 @@ void learn(char* svmfile, int dim){
     huller *h=createHuller(dim);
     samples *s=createSamples();
     readSamples(svmfile,dim,s);
-    printf("Samples eingelesen. Starte Huller\n");
+    fprintf(stderr,"Samples eingelesen. Starte Huller\n");
     mainHuller(h,s);
-    printf("Huller fertig.\n");
+    fprintf(stderr,"Huller fertig.\n");
+    printHuller(h);
     //TODO: Huller als Datei speichern. (Jede Zeile eine Zahl oder durch # trennen in eine Zeile.) Im zweifel stdout, dann in Datei umleiten
     destroyHuller(h);
     destroySamples(s);
@@ -124,6 +128,7 @@ void classify(char* svmfile, char* hulfile,int dim){
             //
        
     */
+    printSamples(s);  //ausgeben der Klassifizierten Punkte
     destroyHuller(h);
     destroySamples(s);
 }
@@ -342,32 +347,54 @@ point* randPoint(samples* s){
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
     for(int i=0;i<MAXITERATIONS;i++){
-        printf("Generation: %d\n",i);
+        fprintf(stderr,"Lerne... %f%% (%d/%d) \n",(roundf(i/(MAXITERATIONS-1))),i,MAXITERATIONS);
         point* p=randPoint(s);
         while(p->alpha!=0){  //Solange random bis wir einen punkt mit alpha=0 finden
             p=randPoint(s);
+            //printf("p->alpha=%f\n",p->alpha);
         }
         updateHuller(h,s,p); //Update auf Punkt starten
         point* r=randPoint(s);
-        while(p->alpha==0){  //Zufälligen punkt mit alpha != 0 suchen
+        while(r->alpha==0){  //Zufälligen punkt mit alpha != 0 suchen
             r=randPoint(s);
+            //printf("r->alpha=%f\n",r->alpha);
         }
         updateHuller(h,s,r); //Update auf Punkt starten
     }
     //funktion ausgeben
-    printf("\ny(x)=(");
+    fprintf(stderr,"\ny(x)=(");
     prettyPrint(h->Xp);
-    printf("-");
+    fprintf(stderr,"-");
     prettyPrint(h->Xn);
-    printf(")x+%f-%f)/2\n",h->XnXn,h->XpXp);
+    fprintf(stderr,"x+%f-%f)/2\n",h->XnXn,h->XpXp);
+
+}
+
+void printHuller(huller *h){
+    printf("%d\n",h->Xn->dim); //anzahl dimensionen
+    printf("xn\n");
+    for(int i=0;i<h->Xn->dim;i++){
+        printf("%f\n",(h->Xn->coords[i]));
+    }
+    printf("xp\n");
+    for(int i=0;i<h->Xp->dim;i++){
+        printf("%f\n",(h->Xp->coords[i]));
+    }
+    printf("xpxp\n");
+    printf("%f\n",h->XpXp);
+    printf("xnxp\n");
+    printf("%f\n",h->XnXp);
+    printf("xnxn\n");
+    printf("%f\n",h->XnXn);
+    printf("ende");
 
 }
 
 void prettyPrint(point* p){
     for(int i=0;i<(p->dim);i++){
-        printf("%f",(p->coords[i]));
+        fprintf(stderr,"%f",(p->coords[i]));
         if(i!=(p->dim-1))
-            printf(",");
+            fprintf(stderr,",");
     }
 }
 
@@ -377,7 +404,6 @@ h->XpXp=dotP(h->Xp,h->Xp);
 h->XnXp=dotP(h->Xn,h->Xp);
 h->XnXn=dotP(h->Xn,h->Xn);
 }
-
 
 //Destruktor
 void destroyHuller(huller *h){
@@ -443,7 +469,7 @@ void readSamples(char *file,int dim,samples *s){
                 if(lasthit==i-1){
                     //nix tun, direkt davor kam ein lerzeichen, zeile ist also zu ende.
                 }else{
-                    printf("\\n gefunden ohne leerzeichen davor! :O\n");
+                    printf("\\n gefunden ohne leerzeichen davor!\n");
                     wlen=(i - lasthit)-1;
                     if(debug)
                         printf("Länge: %d\n",wlen);
