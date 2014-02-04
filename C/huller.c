@@ -119,6 +119,7 @@ void learn(char* svmfile, int dim){
 void classify(char* svmfile, char* hulfile,int dim){
     huller *h=createHuller(dim);
     samples *s=createSamples();
+    readSamples(svmfile,dim,s);
     /*TODO: Samples einlesen (was für eine Dateiformatierung? mit +- am anfang oder ohne?)
             Hullerdatei öffnen und daraus huller erstellen
             Samples durchgehen skalarprodukt mit ebene bilden (?) dementsprechend Klassifizierung ausgeben
