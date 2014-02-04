@@ -112,10 +112,8 @@ void learn(char* svmfile, int dim){
     mainHuller(h,s);
     fprintf(stderr,"Huller fertig.\n");
     printHuller(h);
-    //TODO: Huller als Datei speichern. (Jede Zeile eine Zahl oder durch # trennen in eine Zeile.) Im zweifel stdout, dann in Datei umleiten
     destroyHuller(h);
     destroySamples(s);
-
 }
 
 void classify(char* svmfile, char* hulfile,int dim){
@@ -191,7 +189,10 @@ void printPoint(point *p){
     if(p->class==1)
         printf("+1 ");
 	for(int i=0; i < p->dim; i++){
-		printf("%f ",p->coords[i]);
+		if(p->coords[i]!=0){
+			printf("%d:%f ",i,p->coords[i]);
+							
+		}
 	}
 	printf("\n");
 }
