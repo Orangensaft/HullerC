@@ -102,11 +102,11 @@ int main(int argc, char **argv){
 }
 
 void learn(char* svmfile, int dim){
-    huller *h=createHuller(dim);
-    samples *s=createSamples();
-    readSamples(svmfile,dim,s);
+    huller *h=createHuller(dim); // startet createHuller mit eingegebener Dimension
+    samples *s=createSamples(); // erstellt ein Sample mit Punkten
+    readSamples(svmfile,dim,s); // liest dieses Sample ein und ..
     printf("Samples eingelesen. Starte Huller\n");
-    mainHuller(h,s);
+    mainHuller(h,s);    // startet die Hauptfunktion
     printf("Huller fertig.\n");
     //TODO: Huller als Datei speichern. (Jede Zeile eine Zahl oder durch # trennen in eine Zeile.) Im zweifel stdout, dann in Datei umleiten
     destroyHuller(h);
