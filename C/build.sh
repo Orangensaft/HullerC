@@ -1,1 +1,1 @@
-gcc -Wall -std=gnu11 huller.c -o huller
+gcc -Wall -lm -std=gnu11 huller.c -o huller
