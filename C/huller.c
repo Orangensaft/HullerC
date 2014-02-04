@@ -105,14 +105,6 @@ int main(int argc, char **argv){
 }
 
 void learn(char* svmfile, int dim){
-<<<<<<< HEAD
-    huller *h=createHuller(dim); // startet createHuller mit eingegebener Dimension ** struct "huller"
-    samples *s=createSamples(); // erstellt ein Sample mit Punkten ** struct samples
-    readSamples(svmfile,dim,s); // liest dieses Sample ein und ..
-    printf("Samples eingelesen. Starte Huller\n");
-    mainHuller(h,s);    // startet die Hauptfunktion ( AVG von Punkten bilden und sucht zufällige Punkte raus, updated sie - schleife ) (initHUller + updateHuller)
-    printf("Huller fertig.\n");
-=======
     huller *h=createHuller(dim);
     samples *s=createSamples();
     readSamples(svmfile,dim,s);
@@ -120,7 +112,6 @@ void learn(char* svmfile, int dim){
     mainHuller(h,s);
     fprintf(stderr,"Huller fertig.\n");
     printHuller(h);
->>>>>>> 95363f73c57b1432f21e6050fa26cede581d6868
     //TODO: Huller als Datei speichern. (Jede Zeile eine Zahl oder durch # trennen in eine Zeile.) Im zweifel stdout, dann in Datei umleiten
     destroyHuller(h);
     destroySamples(s);
@@ -137,14 +128,10 @@ void classify(char* svmfile, char* hulfile,int dim){
             //
        
     */
-<<<<<<< HEAD
-    destroyHuller(h); // freigeben
-    destroySamples(s); // freigeben
-=======
+
     printSamples(s);  //ausgeben der Klassifizierten Punkte
     destroyHuller(h);
     destroySamples(s);
->>>>>>> 95363f73c57b1432f21e6050fa26cede581d6868
 }
 
 //punkt im dim-dimensionalen raum erstellen
