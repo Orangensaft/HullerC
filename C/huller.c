@@ -269,13 +269,6 @@ void initHuller(huller* h,samples* s){
     destroyPoint(tmp);
     //Xp und Xn stehen jetzt. Jetzt noch Skalare berechen.
     updateScalars(h);
-    //alpha startwerte erstellen: (Damit Summe_alpha = 1 gilt.)
-    for(int i=0;i<s->count_p;i++){
-       s->sample_p[i]->alpha = 1/s->count_p;
-    }
-    for(int i=0;i<s->count_n;i++){
-       s->sample_n[i]->alpha = 1/s->count_n;
-    }
 }
 
 float min(float a, float b){
