@@ -252,17 +252,19 @@ void initHuller(huller* h,samples* s){
    //Avg von Punkten berechnen
    int k=0;
    point *tmp = createPoint((s->sample_p[0])->dim);
-   for(int i=0;i<AVGCOUNT;i++){
+   for(int i=0;i<AVGCOUNT;i++){ //AVGCOUNT viele positive Punkte suchen
         k=random()%(s->count_p);
         pointAdd(tmp,s->sample_p[k]); //Punkt aufaddieren
+        s->sample_p[k]->alpha=1/AVGCOUNT;  //alpha auf 1/avgcount setzen
     }   //--> in tmp liegt jetzt die summe der punkte
     pointDiv(tmp,AVGCOUNT);
     pointCopy(h->Xp,tmp);
     destroyPoint(tmp);
     tmp = createPoint((s->sample_n[0])->dim);
-    for(int i=0;i<AVGCOUNT;i++){
+    for(int i=0;i<AVGCOUNT;i++){ //AVGCOUNT viele negative Punkte suchen
         k=random()%(s->count_n);
         pointAdd(tmp,s->sample_n[k]);
+        s->sample_n[k]->alpha=1/AVGCOUNT;   //alpha auf 1/avgcount setzen
     }     //--> in n liegt jetzt die summe der punkte
     pointDiv(tmp,AVGCOUNT);
     pointCopy(h->Xn,tmp);
