@@ -766,6 +766,7 @@ void completeTest(){
 void loadHullerTest(){
     printf("Test, ob Huller geladen werden kann\n\n");
     huller *h=hullerFromFile("modell");
+    printHuller(h);
     destroyHuller(h);
 
 }
