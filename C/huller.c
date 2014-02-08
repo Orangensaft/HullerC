@@ -58,6 +58,7 @@ void initHuller(huller* h,samples* s);
 void testInit();
 void pointCopy(point* dest, point* src);
 void pointAdd(point *p1, point *p2);
+void pointSub(point *p1, point *p2);
 void updateScalars(huller *h);
 void destroyHuller(huller *h);
 huller *createHuller(int dim);
@@ -123,19 +124,31 @@ void learn(char* svmfile, int dim){
 }
 
 void classify(char* svmfile, char* hulfile,int dim){
-    huller *h=createHuller(dim);
+    huller *h=hullerFromFile(hulfile); //hullermodell einlesen
     samples *s=createSamples();
     readSamples(svmfile,dim,s);
-    /*TODO: Hullerdatei öffnen und daraus huller erstellen
-            Samples durchgehen skalarprodukt mit ebene bilden (?) dementsprechend Klassifizierung ausgeben
-            Punkte dann vlt in einer Datei Klassifiziert speichert. (Im Zweifel einfach im Stdout ausgeben, das kann ein eine Datei umgeleitet werden)
-            //
-       
-    */
-
+    point *tmp=createPoint(dim);
+    pointAdd(tmp,h->Xp); // tmp auf Xp setzen
+    pointSub(tmp,h->Xn); //->(Xp-Xn)
+    float n=0.0;
+    int classold=0;
+    float yx=0.0;
+    n=((h->XnXn)-(h->XpXp))/2.0;
+    //y(x)=dotP(tmp,x) + n
+    printf("Klassifiziere 'positive Punkte'\n");
+    for(int i=0;i<s->count_p;i++){ //zunächst 'positive' klassifizieren
+        yx=dotP(tmp,s->sample_p[i]) + n;
+        printf("Class -> %f\n",yx);
+    }
+    printf("Ab jetzt nurnoch 'negative'\n");
+    for(int i=0;i<s->count_n;i++){
+        yx=dotP(tmp,s->sample_n[i]) +n;
+        printf("Class -> %f\n",yx);
+    }
     printSamples(s);  //ausgeben der Klassifizierten Punkte
     destroyHuller(h);
     destroySamples(s);
+    destroyPoint(tmp);
 }
 
 //punkt im dim-dimensionalen raum erstellen
@@ -237,18 +250,15 @@ huller *hullerFromFile(char* file){
         if(state==0){
             if(strncmp(buf,"xn",2)==0){
                 state=1;
-                printf("xn gefunden, Springe in state=1 (xn einlesen)\n");
                 continue;
             }else{
                 dim=atoi(buf);
-                printf("Dimension beim einlesen gefunden! %d \n",dim);
                 h = createHuller(dim);
             }
         }
         if(state==1){
             if(strncmp(buf,"xp",2)==0){
                 state=2;
-                printf("xp gefunden, Springe in state=2 (xp einlesen)\n");
                 i=0;
                 continue;
             }else{
@@ -259,7 +269,6 @@ huller *hullerFromFile(char* file){
         if(state==2){
             if(strncmp(buf,"xpxp",4)==0){
                 state=3;
-                printf("xpxp gefunden, Springe in state=3 (xpxp einlesen)\n");
                 i=0;
                 continue;
             }else{
@@ -270,7 +279,6 @@ huller *hullerFromFile(char* file){
         if(state==3){
             if(strncmp(buf,"xnxp",4)==0){
                 state=4;
-                printf("xnxp gefunden, state=4 (xnxp einlesen)\n");
                 continue;
             }else{
                 h->XpXp=strtof(buf,NULL);
@@ -279,7 +287,6 @@ huller *hullerFromFile(char* file){
         if(state==4){
             if(strncmp(buf,"xnxn",4)==0){
                 state=5;
-                printf("xnxn gefunden, state=5 (xnxn einlesen)\n");
                 continue;
             }else{
                 h->XnXp=strtof(buf,NULL);
@@ -287,7 +294,6 @@ huller *hullerFromFile(char* file){
         }
         if(state==5){
             if(strncmp(buf,"ende",4)==0){
-                printf("Ende erreicht. Fertig eingelesen!\n");
                 break;
             }else{
                 h->XnXn=strtof(buf,NULL);
@@ -312,6 +318,14 @@ void pointAdd(point *p1, point *p2){
     assert(p1->dim==p2->dim);
     for(int i=0;i<p1->dim;i++){
         p1->coords[i] += p2->coords[i];
+    }
+}
+
+//p1=p1-p2;
+void pointSub(point *p1, point *p2){
+    assert(p1->dim==p2->dim);
+    for(int i=0;i<p1->dim;i++){
+        p1->coords[i] -= p2->coords[i];
     }
 }
 
