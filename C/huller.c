@@ -8,7 +8,7 @@
 #include <math.h>
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
-#define AVGCOUNT 10
+#define AVGCOUNT 100
 //Maximale Anzahl der Iterationen
 #define MAXITERATIONS 100000
 // je größer desto genauer
@@ -61,6 +61,7 @@ void pointAdd(point *p1, point *p2);
 void updateScalars(huller *h);
 void destroyHuller(huller *h);
 huller *createHuller(int dim);
+huller *hullerFromFile(char* file);
 void mainHuller(huller* h, samples* s);
 void updateHuller(huller* h, samples* s,point* xn);
 point* randPoint(samples* s);
@@ -72,19 +73,24 @@ void printSamples(samples* s);
 void classify(char* svmfile, char* hulfile,int dim);
 void learn(char* svmfile,int dim);
 void printHuller(huller *h);
+void testHINIT();
+void alphaStats(samples *s);
+void loadHullerTest();
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
     if(argc==1){
         printf("Keine Argumente angegeben; Wechsele in Testmodus\n");
         getchar();
-        debug=1;
+        loadHullerTest();
+        //testHINIT();
+        //debug=1;
         //testPoint();
         //sampleTest();    
         //testFile("testinput.svm",150);
        // testAddComp();   
         //testInit();
-        completeTest();        
+        //completeTest();        
         exit(EXIT_SUCCESS);
     }  
     if(argc==4){
@@ -120,8 +126,7 @@ void classify(char* svmfile, char* hulfile,int dim){
     huller *h=createHuller(dim);
     samples *s=createSamples();
     readSamples(svmfile,dim,s);
-    /*TODO: Samples einlesen (was für eine Dateiformatierung? mit +- am anfang oder ohne?)
-            Hullerdatei öffnen und daraus huller erstellen
+    /*TODO: Hullerdatei öffnen und daraus huller erstellen
             Samples durchgehen skalarprodukt mit ebene bilden (?) dementsprechend Klassifizierung ausgeben
             Punkte dann vlt in einer Datei Klassifiziert speichert. (Im Zweifel einfach im Stdout ausgeben, das kann ein eine Datei umgeleitet werden)
             //
@@ -221,6 +226,48 @@ huller *createHuller(int dim){
     return h;
 }
 
+huller *hullerFromFile(char* file){
+    int dim=0;
+    int state=0; //0->Dimension lesen 1> xn lesen 2->xp lesen 3->pp 4->np->5nn
+    FILE *hullerfile = fopen(file,"r"); //hullerdatei öffnen
+    char *buf = malloc(10000);
+    while(fgets(buf,10000,hullerfile)){ //in buf liegt jetzt immer die aktuelle zeile.
+        if(state==0){
+            if(strncmp(buf,"xn",2)==0){
+                state=1;
+            }else{
+                dim=atoi(buf);
+                printf("Dimension beim einlesen gefunden! %d \n",dim);
+            }
+        }
+        if(state==1){
+
+        }
+        if(state==2){
+    
+        }
+        if(state==3){
+
+        }
+        if(state==4){
+
+        }
+        if(state==5){
+
+        }
+
+    }
+    //datei öffnen
+    //einlesen
+    //->Erste Zeile ist Dimension. Wenn die eingelesen ist Huller erstellen
+    //->Restliche Zeilen einlesen, bei "ende" aufhören.
+    
+    huller *h = createHuller(dim);
+    fclose(hullerfile); //datei auch wieder schließen
+    free(buf);
+    return h;
+}
+
 //punkt kopieren -> komponentenweise
 void pointCopy(point* dest, point* src){
     assert(dest->dim == src->dim);
@@ -255,7 +302,7 @@ void initHuller(huller* h,samples* s){
    for(int i=0;i<AVGCOUNT;i++){ //AVGCOUNT viele positive Punkte suchen
         k=random()%(s->count_p);
         pointAdd(tmp,s->sample_p[k]); //Punkt aufaddieren
-        s->sample_p[k]->alpha=1/AVGCOUNT;  //alpha auf 1/avgcount setzen
+        s->sample_p[k]->alpha=((float)1)/((float)AVGCOUNT);  //alpha auf 1/avgcount setzen
     }   //--> in tmp liegt jetzt die summe der punkte
     pointDiv(tmp,AVGCOUNT);
     pointCopy(h->Xp,tmp);
@@ -264,7 +311,7 @@ void initHuller(huller* h,samples* s){
     for(int i=0;i<AVGCOUNT;i++){ //AVGCOUNT viele negative Punkte suchen
         k=random()%(s->count_n);
         pointAdd(tmp,s->sample_n[k]);
-        s->sample_n[k]->alpha=1/AVGCOUNT;   //alpha auf 1/avgcount setzen
+        s->sample_n[k]->alpha=((float)1)/((float)AVGCOUNT);  //alpha auf 1/avgcount setzen
     }     //--> in n liegt jetzt die summe der punkte
     pointDiv(tmp,AVGCOUNT);
     pointCopy(h->Xn,tmp);
@@ -345,17 +392,17 @@ point* randPoint(samples* s){
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
     for(int i=0;i<MAXITERATIONS;i++){
-        fprintf(stderr,"Lerne... %f%% (%d/%d) \n",(roundf(i/(MAXITERATIONS-1))),i,MAXITERATIONS);
+        fprintf(stderr,"Lerne... %f%% (%d/%d) \n",(((float)i)/((float)MAXITERATIONS))*100,i,MAXITERATIONS);
         point* p=randPoint(s);
+        //alphaStats(s);
         while(p->alpha!=0){  //Solange random bis wir einen punkt mit alpha=0 finden
             p=randPoint(s);
-            //printf("p->alpha=%f\n",p->alpha);
         }
         updateHuller(h,s,p); //Update auf Punkt starten
         point* r=randPoint(s);
+        //alphaStats(s);
         while(r->alpha==0){  //Zufälligen punkt mit alpha != 0 suchen
             r=randPoint(s);
-            //printf("r->alpha=%f\n",r->alpha);
         }
         updateHuller(h,s,r); //Update auf Punkt starten
     }
@@ -554,9 +601,43 @@ void testFile(char *input,int dim){
     printSamples(s);
     destroySamples(s);
     getchar();
-    //TODO: Mit den Samples weiterarbeiten
 }
 
+void testHINIT(){
+    printf("\n\nTeste hullerInit\n\n");
+    samples *s = createSamples();
+    readSamples("a1a.svm",123,s);
+    huller *h = createHuller(123);
+    printf("Vor init alphaStats\n");
+    alphaStats(s);
+    initHuller(h,s);
+    printf("Nach init AlphaStats\n");
+    alphaStats(s);
+    destroyHuller(h);
+    destroySamples(s);
+
+}
+
+void alphaStats(samples *s){
+    int sumnull=0;
+    int sumnotnull=0;
+    for(int i=0;i<s->count_n;i++){
+        if(s->sample_n[i]->alpha==0){
+            sumnull=sumnull+1;
+        }else{
+            sumnotnull=sumnotnull+1;
+        }
+    }
+    for(int i=0;i<s->count_p;i++){
+        if(s->sample_p[i]->alpha==0){
+            sumnull=sumnull+1;
+        }else{
+            sumnotnull=sumnotnull+1;        
+        }
+    }
+    printf("Anzahl alpha=0 : %d\n",sumnull);
+    printf("Anzahl alpha!=0: %d\n",sumnotnull);
+}
 
 //Test der Point-Datenstruktur: konstruktur, destruktor, Skalarprodukt und avg-Operation
 //--> Keine Speicherfehler
@@ -648,5 +729,12 @@ void completeTest(){
     printSamples(s);
     destroySamples(s);
    // printf("Dauer für das Einlesen von 1605 Samples: %f\n",(time_after.tv_sec - time_before.tv_sec)*(1000000000l) + (time_after.tv_nsec - time_before.tv_nsec));
+
+}
+
+void loadHullerTest(){
+    printf("Test, ob Huller geladen werden kann\n\n");
+    huller *h=hullerFromFile("modell");
+    destroyHuller(h);
 
 }
