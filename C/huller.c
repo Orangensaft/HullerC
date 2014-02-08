@@ -231,38 +231,69 @@ huller *hullerFromFile(char* file){
     int state=0; //0->Dimension lesen 1> xn lesen 2->xp lesen 3->pp 4->np->5nn
     FILE *hullerfile = fopen(file,"r"); //hullerdatei öffnen
     char *buf = malloc(10000);
+    int i=0;
+    huller *h;
     while(fgets(buf,10000,hullerfile)){ //in buf liegt jetzt immer die aktuelle zeile.
         if(state==0){
             if(strncmp(buf,"xn",2)==0){
                 state=1;
+                printf("xn gefunden, Springe in state=1 (xn einlesen)\n");
+                continue;
             }else{
                 dim=atoi(buf);
                 printf("Dimension beim einlesen gefunden! %d \n",dim);
+                h = createHuller(dim);
             }
         }
         if(state==1){
-
+            if(strncmp(buf,"xp",2)==0){
+                state=2;
+                printf("xp gefunden, Springe in state=2 (xp einlesen)\n");
+                i=0;
+                continue;
+            }else{
+                h->Xn->coords[i]=strtof(buf,NULL);
+                i=i+1;
+            }
         }
         if(state==2){
-    
+            if(strncmp(buf,"xpxp",4)==0){
+                state=3;
+                printf("xpxp gefunden, Springe in state=3 (xpxp einlesen)\n");
+                i=0;
+                continue;
+            }else{
+                h->Xp->coords[i]=strtof(buf,NULL);
+                i=i+1;
+            }
         }
         if(state==3){
-
+            if(strncmp(buf,"xnxp",4)==0){
+                state=4;
+                printf("xnxp gefunden, state=4 (xnxp einlesen)\n");
+                continue;
+            }else{
+                h->XpXp=strtof(buf,NULL);
+            }
         }
         if(state==4){
-
+            if(strncmp(buf,"xnxn",4)==0){
+                state=5;
+                printf("xnxn gefunden, state=5 (xnxn einlesen)\n");
+                continue;
+            }else{
+                h->XnXp=strtof(buf,NULL);
+            }
         }
         if(state==5){
-
+            if(strncmp(buf,"ende",4)==0){
+                printf("Ende erreicht. Fertig eingelesen!\n");
+                break;
+            }else{
+                h->XnXn=strtof(buf,NULL);
+            }
         }
-
     }
-    //datei öffnen
-    //einlesen
-    //->Erste Zeile ist Dimension. Wenn die eingelesen ist Huller erstellen
-    //->Restliche Zeilen einlesen, bei "ende" aufhören.
-    
-    huller *h = createHuller(dim);
     fclose(hullerfile); //datei auch wieder schließen
     free(buf);
     return h;
