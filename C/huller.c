@@ -59,6 +59,8 @@ void testInit();
 void pointCopy(point* dest, point* src);
 void pointAdd(point *p1, point *p2);
 void pointSub(point *p1, point *p2);
+void pointMult(point *p1,float n);
+void pointSet(point *p1,float n);
 void updateScalars(huller *h);
 void destroyHuller(huller *h);
 huller *createHuller(int dim);
@@ -137,7 +139,7 @@ void classify(char* svmfile, char* hulfile,int dim){
     //y(x)=dotP(tmp,x) + n
     printf("Klassifiziere 'positive Punkte'\n");
     for(int i=0;i<s->count_p;i++){ //zunächst 'positive' klassifizieren
-        yx=dotP(tmp,s->sample_p[i]) + n;
+        yx=dotP(tmp,s->sample_p[i]) +n;
         printf("Class -> %f\n",yx);
     }
     printf("Ab jetzt nurnoch 'negative'\n");
@@ -336,6 +338,18 @@ void pointDiv(point *p1,float n){
      }
 }
 
+void pointMult(point *p1,float n){
+    for(int i=0;i<p1->dim;i++){
+        p1->coords[i]=(p1->coords[i])*n;
+    }
+}
+//alle komponenten auf n setzen
+void pointSet(point *p1,float n){
+    for(int i=0;i<p1->dim;i++){
+        p1->coords[i]=n;
+    }
+}
+
 //Huller initialisieren
 //Die Summe der alpha i (für positive) und alpha j (für negative) muss 1 sein
 //-> alpha_i = 1/count_p
@@ -451,12 +465,32 @@ void mainHuller(huller* h, samples* s){
         }
         updateHuller(h,s,r); //Update auf Punkt starten
     }
+    //jetzt noch XP und XN ändern.
+    point *tmp=createPoint(h->Xp->dim);
+    point *tmp2=createPoint(h->Xp->dim);
+    for(int i=0;i<s->count_p;i++){  //Xp berechnen
+        pointSet(tmp2,0);       //tmp2 leer
+        pointAdd(tmp2,s->sample_p[i]);  //tmp2 = x
+        pointMult(tmp2,s->sample_p[i]->alpha);    //tmp2 = x*alpha    
+        pointAdd(tmp,tmp2);         //tmp += tmp2 (x*alpha)
+    }
+    pointCopy(h->Xp,tmp);
+    pointSet(tmp,0);
+    for(int i=0;i<s->count_n;i++){  //Xn berechnen
+        pointSet(tmp2,0),
+        pointAdd(tmp2,s->sample_n[i]);
+        pointMult(tmp2,s->sample_n[i]->alpha);
+        pointAdd(tmp,tmp2);
+    }
+    pointCopy(h->Xn,tmp);
     //funktion ausgeben
     fprintf(stderr,"\ny(x)=(");
     prettyPrint(h->Xp);
     fprintf(stderr,"-");
     prettyPrint(h->Xn);
     fprintf(stderr,"x+%f-%f)/2\n",h->XnXn,h->XpXp);
+    destroyPoint(tmp);
+    destroyPoint(tmp2);
 
 }
 
