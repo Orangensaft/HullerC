@@ -16,10 +16,10 @@
 int debug=0;
 
 typedef struct{
-	long double* coords;
+	double* coords;
 	int dim;
     int class; //0 -> -; 1 -> +;
-    long double alpha;
+    double alpha;
 } point;
 
 //Array aus count vielen Punkten
@@ -34,14 +34,14 @@ typedef struct{
 typedef struct{
    point *Xp;
    point *Xn;
-   long double XpXp;
-   long double XnXp;
-   long double XnXn;
+   double XpXp;
+   double XnXp;
+   double XnXn;
 } huller;
 
 point *createPoint(int dim);
 void destroyPoint(point *p);
-long double dotP(point *p1,point *p2);
+double dotP(point *p1,point *p2);
 point *randomPoint(int dim);
 void printPoint(point *p);
 void avgPoints(point *p1, point *p2);
@@ -49,7 +49,7 @@ void testPoint();
 void testFile(char *input,int dim);
 void testAddComp();
 void sampleTest();
-void pointAddComp(point *p,long double val);
+void pointAddComp(point *p,double val);
 samples* createSamples();
 void sampleAdd(samples* s,point* p);
 void readSamples(char *file,int dim,samples *s);
@@ -59,8 +59,8 @@ void testInit();
 void pointCopy(point* dest, point* src);
 void pointAdd(point *p1, point *p2);
 void pointSub(point *p1, point *p2);
-void pointMult(point *p1,long double n);
-void pointSet(point *p1,long double n);
+void pointMult(point *p1,double n);
+void pointSet(point *p1,double n);
 void updateScalars(huller *h);
 void destroyHuller(huller *h);
 huller *createHuller(int dim);
@@ -69,8 +69,8 @@ void mainHuller(huller* h, samples* s);
 void updateHuller(huller* h, samples* s,point* xn);
 point* randPoint(samples* s);
 void completeTest();
-long double max(long double a, long double b);
-long double min(long double a, long double b);
+double max(double a, double b);
+double min(double a, double b);
 void prettyPrint(point* p);
 void printSamples(samples* s);
 void classify(char* svmfile, char* hulfile,int dim);
@@ -132,20 +132,20 @@ void classify(char* svmfile, char* hulfile,int dim){
     point *tmp=createPoint(dim);
     pointAdd(tmp,h->Xp); // tmp auf Xp setzen
     pointSub(tmp,h->Xn); //->(Xp-Xn)
-    long double n=0.0;
+    double n=0.0;
     int classold=0;
-    long double yx=0.0;
+    double yx=0.0;
     n=((h->XnXn)-(h->XpXp))/2.0;
     //y(x)=dotP(tmp,x) + n
     printf("Klassifiziere 'positive Punkte'\n");
     for(int i=0;i<s->count_p;i++){ //zunächst 'positive' klassifizieren
         yx=dotP(tmp,s->sample_p[i]) +n;
-        printf("Class -> %Lf\n",yx);
+        printf("Class -> %lf\n",yx);
     }
     printf("Ab jetzt nurnoch 'negative'\n");
     for(int i=0;i<s->count_n;i++){
         yx=dotP(tmp,s->sample_n[i]) +n;
-        printf("Class -> %Lf\n",yx);
+        printf("Class -> %lf\n",yx);
     }
     printSamples(s);  //ausgeben der Klassifizierten Punkte
     destroyHuller(h);
@@ -158,7 +158,7 @@ point *createPoint(int dim){
     assert(dim>=0);
 	point *p=malloc(sizeof(point));	//speicher für struct reservieren
 	p->dim=dim;
-	p->coords=calloc(dim,sizeof(long double)); //speicher für long double-array (dim*sizeof(long double))
+	p->coords=calloc(dim,sizeof(double)); //speicher für double-array (dim*sizeof(double))
     p->class=0;
     p->alpha=0;
 	return p;
@@ -169,8 +169,8 @@ dadurch wäre es theoretisch auch möglich einzulesen ohne die Dimension zu kenn
 ->Starte bei Dimension 0. Wenn ein neues Attribut auftaucht (zB. 15:1) die Dimension darauf erhöhen.
 ->Das allerdings auch rückwirkend auf alle anderen Punkte. -> Extreme Steigerung der Laufzeit
 */
-void pointAddComp(point *p,long double val){
-    p->coords = realloc(p->coords, sizeof(long double)*(p->dim+1));
+void pointAddComp(point *p,double val){
+    p->coords = realloc(p->coords, sizeof(double)*(p->dim+1));
     p->dim=p->dim+1;
     p->coords[p->dim-1]=val; //mit 0 initialisieren
 }
@@ -182,9 +182,9 @@ void destroyPoint(point *p){
 }
 
 //skalarprodukt
-long double dotP(point *p1, point *p2){
+double dotP(point *p1, point *p2){
 	assert(p1->dim == p2->dim);
-	long double ret=0.0;   //zwangsweise initialisieren?	
+	double ret=0.0;   //zwangsweise initialisieren?	
 	for(int i=0;i<p1->dim;i++){
 		ret+=(p1->coords[i])*(p2->coords[i]);	
 	}	
@@ -195,7 +195,7 @@ long double dotP(point *p1, point *p2){
 point *randomPoint(int dim){
 	point *p=createPoint(dim);
 	for(int i=0;i<dim;i++){
-		p->coords[i]=(long double)(random()/random());
+		p->coords[i]=(double)(random()/random());
 	}
     p->class=random()%2;
 	return p;
@@ -212,7 +212,7 @@ void printPoint(point *p){
         printf("+1 ");
 	for(int i=0; i < p->dim; i++){
 		if(p->coords[i]!=0){
-			printf("%d:%Lf ",i,p->coords[i]);
+			printf("%d:%lf ",i,p->coords[i]);
 							
 		}
 	}
@@ -332,19 +332,19 @@ void pointSub(point *p1, point *p2){
 }
 
 //Punkt durch n Teilen
-void pointDiv(point *p1,long double n){
+void pointDiv(point *p1,double n){
     for(int i=0;i<p1->dim;i++){
            p1->coords[i]=(p1->coords[i])/n;
      }
 }
 
-void pointMult(point *p1,long double n){
+void pointMult(point *p1,double n){
     for(int i=0;i<p1->dim;i++){
         p1->coords[i]=(p1->coords[i])*n;
     }
 }
 //alle komponenten auf n setzen
-void pointSet(point *p1,long double n){
+void pointSet(point *p1,double n){
     for(int i=0;i<p1->dim;i++){
         p1->coords[i]=n;
     }
@@ -361,7 +361,7 @@ void initHuller(huller* h,samples* s){
    for(int i=0;i<AVGCOUNT;i++){ //AVGCOUNT viele positive Punkte suchen
         k=random()%(s->count_p);
         pointAdd(tmp,s->sample_p[k]); //Punkt aufaddieren
-        s->sample_p[k]->alpha=((long double)1)/((long double)AVGCOUNT);  //alpha auf 1/avgcount setzen
+        s->sample_p[k]->alpha=((double)1)/((double)AVGCOUNT);  //alpha auf 1/avgcount setzen
     }   //--> in tmp liegt jetzt die summe der punkte
     pointDiv(tmp,AVGCOUNT);
     pointCopy(h->Xp,tmp);
@@ -370,7 +370,7 @@ void initHuller(huller* h,samples* s){
     for(int i=0;i<AVGCOUNT;i++){ //AVGCOUNT viele negative Punkte suchen
         k=random()%(s->count_n);
         pointAdd(tmp,s->sample_n[k]);
-        s->sample_n[k]->alpha=((long double)1)/((long double)AVGCOUNT);  //alpha auf 1/avgcount setzen
+        s->sample_n[k]->alpha=((double)1)/((double)AVGCOUNT);  //alpha auf 1/avgcount setzen
     }     //--> in n liegt jetzt die summe der punkte
     pointDiv(tmp,AVGCOUNT);
     pointCopy(h->Xn,tmp);
@@ -379,7 +379,7 @@ void initHuller(huller* h,samples* s){
     updateScalars(h);
 }
 
-long double min(long double a, long double b){
+double min(double a, double b){
     if(a<=b){
         return a;
     }else{
@@ -387,7 +387,7 @@ long double min(long double a, long double b){
     }
 }
 
-long double max(long double a, long double b){
+double max(double a, double b){
     if(a>=b){
         return a;
     }else{
@@ -399,12 +399,12 @@ long double max(long double a, long double b){
 
 //Huller updaten
 void updateHuller(huller* h, samples* s,point* xn){
-    long double Xpxn = dotP(h->Xp,xn);
-    long double Xnxn = dotP(h->Xn,xn);
-    long double xnxn = dotP(xn,xn);
-    long double alpha_k = xn->alpha;
-    long double lambda_u=0.0;
-    long double lambda = 0.0;    
+    double Xpxn = dotP(h->Xp,xn);
+    double Xnxn = dotP(h->Xn,xn);
+    double xnxn = dotP(xn,xn);
+    double alpha_k = xn->alpha;
+    double lambda_u=0.0;
+    double lambda = 0.0;    
     if(xn->class==0){ //negativ Gleichung 5
         lambda_u = ((h->XnXn)-(h->XnXp)-Xnxn+Xpxn)/((h->XnXn)+xnxn-2*Xnxn);
     }else{  //positiv  Gleichung 4
@@ -452,7 +452,7 @@ void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
     for(int i=0;i<MAXITERATIONS;i++){
         if(i%(MAXITERATIONS/20)==0)
-        fprintf(stderr,"Lerne... %Lf%% (%d/%d) \n",(((long double)i)/((long double)MAXITERATIONS))*100,i,MAXITERATIONS);
+        fprintf(stderr,"Lerne... %lf%% (%d/%d) \n",(((double)i)/((double)MAXITERATIONS))*100,i,MAXITERATIONS);
         point* p=randPoint(s);
         //alphaStats(s);
         while(p->alpha!=0){  //Solange random bis wir einen punkt mit alpha=0 finden
@@ -489,7 +489,7 @@ void mainHuller(huller* h, samples* s){
     prettyPrint(h->Xp);
     fprintf(stderr,"-");
     prettyPrint(h->Xn);
-    fprintf(stderr,"x+%Lf-%Lf)/2\n",h->XnXn,h->XpXp);
+    fprintf(stderr,"x+%lf-%lf)/2\n",h->XnXn,h->XpXp);
     destroyPoint(tmp);
     destroyPoint(tmp2);
     alphaStats(s);
@@ -500,25 +500,25 @@ void printHuller(huller *h){
     printf("%d\n",h->Xn->dim); //anzahl dimensionen
     printf("xn\n");
     for(int i=0;i<h->Xn->dim;i++){
-        printf("%Lf\n",(h->Xn->coords[i]));
+        printf("%lf\n",(h->Xn->coords[i]));
     }
     printf("xp\n");
     for(int i=0;i<h->Xp->dim;i++){
-        printf("%Lf\n",(h->Xp->coords[i]));
+        printf("%lf\n",(h->Xp->coords[i]));
     }
     printf("xpxp\n");
-    printf("%Lf\n",h->XpXp);
+    printf("%lf\n",h->XpXp);
     printf("xnxp\n");
-    printf("%Lf\n",h->XnXp);
+    printf("%lf\n",h->XnXp);
     printf("xnxn\n");
-    printf("%Lf\n",h->XnXn);
+    printf("%lf\n",h->XnXn);
     printf("ende");
 
 }
 
 void prettyPrint(point* p){
     for(int i=0;i<(p->dim);i++){
-        fprintf(stderr,"%Lf",(p->coords[i]));
+        fprintf(stderr,"%lf",(p->coords[i]));
         if(i!=(p->dim-1))
             fprintf(stderr,",");
     }
@@ -541,7 +541,7 @@ void destroyHuller(huller *h){
 /*
 //Samples einlesen -> dim dimensionen maximal.
 //gehe von folgender formatierung aus:
-(+|-)1 1:%Lf 2:%Lf ... dim:%Lf
+(+|-)1 1:%lf 2:%lf ... dim:%lf
 Wobei Attribute die nicht auftauchenden default 0 gesetzt werden
 Bsp:
 -1 3:1 6:1 17:1 27:1 35:1 ...
@@ -554,7 +554,7 @@ void readSamples(char *file,int dim,samples *s){
     int matches=0;
     int lasthit=0;
     int dimIndex=0;
-    long double value=0.0;
+    double value=0.0;
     point *p;
     char *curComp = malloc(500000); //aktuelle komponente
     char *buf = malloc(500000); //wir wissen nicht wie lang eine zeile maximal werden kann
@@ -585,9 +585,9 @@ void readSamples(char *file,int dim,samples *s){
                     curComp[wlen]='\0';
                     if(debug)
                         printf("Komponente: %s\n",curComp);
-                    sscanf(curComp,"%d:%Lf",&dimIndex,&value);
+                    sscanf(curComp,"%d:%lf",&dimIndex,&value);
                     if(debug)                    
-                        printf("Dim :%d - Value:%Lf\n",dimIndex,value);
+                        printf("Dim :%d - Value:%lf\n",dimIndex,value);
                     p->coords[dimIndex]=value;
                 }
                 lasthit=i;
@@ -603,9 +603,9 @@ void readSamples(char *file,int dim,samples *s){
                     curComp[wlen]='\0';
                     if(debug)
                         printf("Komponente: %s\n",curComp);
-                    sscanf(curComp,"%d:%Lf",&dimIndex,&value);
+                    sscanf(curComp,"%d:%lf",&dimIndex,&value);
                     if(debug)                    
-                        printf("Dim :%d - Value:%Lf\n",dimIndex,value);
+                        printf("Dim :%d - Value:%lf\n",dimIndex,value);
                     p->coords[dimIndex]=value; 
                 }
 
@@ -775,7 +775,7 @@ void testInit(){
     printf("Startwert Xn:\n");
     printPoint(h->Xn);
     destroySamples(s);
-    printf("XpXp: %Lf XnXp: %Lf XnXn: %Lf\n",h->XpXp,h->XnXp,h->XnXn);
+    printf("XpXp: %lf XnXp: %lf XnXn: %lf\n",h->XpXp,h->XnXp,h->XnXn);
     destroyHuller(h);
 }
 
@@ -810,7 +810,7 @@ void completeTest(){
     //clock_gettime(CLOCK_MONOTONIC, &time_after);
     printSamples(s);
     destroySamples(s);
-   // printf("Dauer für das Einlesen von 1605 Samples: %Lf\n",(time_after.tv_sec - time_before.tv_sec)*(1000000000l) + (time_after.tv_nsec - time_before.tv_nsec));
+   // printf("Dauer für das Einlesen von 1605 Samples: %lf\n",(time_after.tv_sec - time_before.tv_sec)*(1000000000l) + (time_after.tv_nsec - time_before.tv_nsec));
 
 }
 
