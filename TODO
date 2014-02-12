@@ -1,14 +1,12 @@
 Modellgenerator:
+-Alpha-Listen erstellen (performanz ++)
 
--Startwert für Alphas setzten (paar punkte avg, von denen alpha setzen)
 
 Klassifizierer:
--svm-Datensätze einlesen (Testmenge ohne +,- Bewertung) //kein problem, class wird einfach ignoriert und dann überprüft ob der punkt richtig liegt
 -Anhand des gegebenen Modells klassifizieren            //punkte einlesen und mit ebene vergleichen (wie?)
-
+->Rausfinden wie wir das machen können
 
 Wenn das erledigt ist:
 -Testen auf Erkennungsrate
--Speicherlecks beseitigen   (Bis jetzt keine aufgetreten :D)
 -Testen auf Performanz
 -Eventuelle Optimierung
