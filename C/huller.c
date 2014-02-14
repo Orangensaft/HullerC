@@ -588,6 +588,7 @@ void readSamples(char *file,int dim,samples *s){
                     sscanf(curComp,"%d:%lf",&dimIndex,&value);
                     if(debug)                    
                         printf("Dim :%d - Value:%lf\n",dimIndex,value);
+                    assert(dimIndex<p->dim);
                     p->coords[dimIndex]=value;
                 }
                 lasthit=i;
@@ -606,6 +607,7 @@ void readSamples(char *file,int dim,samples *s){
                     sscanf(curComp,"%d:%lf",&dimIndex,&value);
                     if(debug)                    
                         printf("Dim :%d - Value:%lf\n",dimIndex,value);
+                    assert(dimIndex<p->dim);
                     p->coords[dimIndex]=value; 
                 }
 
