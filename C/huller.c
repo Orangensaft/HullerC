@@ -159,6 +159,7 @@ void classify(char* svmfile, char* hulfile,int dim){
         if(classold==class){ //richtig! treffer zählen.
             rate=rate+1;
         }
+        s->sample_p[i]->class=class;
     }
     fprintf(stderr,"Ab jetzt nurnoch 'negative'\n");
     for(int i=0;i<s->count_n;i++){
@@ -175,6 +176,7 @@ void classify(char* svmfile, char* hulfile,int dim){
         if(classold==class){
             rate=rate+1;
         }
+        s->sample_n[i]->class=class;
     }
     printSamples(s);  //ausgeben der Klassifizierten Punkte
     fprintf(stderr,"Klassifizierung von %d Punkten abgeschlossen.\n",s->count_n+s->count_p);
