@@ -130,26 +130,46 @@ void classify(char* svmfile, char* hulfile,int dim){
     samples *s=createSamples();
     readSamples(svmfile,dim,s);
     point *tmp=createPoint(dim);
-    pointAdd(tmp,h->Xp); // tmp auf Xp setzen
-    pointSub(tmp,h->Xn); //->(Xp-Xn)
-    double n=0.0;
+    point *n=createPoint(dim);
+    pointAdd(n,h->Xp); // n auf Xp setzen
+    pointSub(n,h->Xn); //->(Xp-Xn)   -> Normalenvektor n
+    point *a=createPoint(dim);
+    pointAdd(a,h->Xp);
+    avgPoints(a,h->Xn); // a -> Ortsvektor (Xp+Xn)/2
     int classold=0;
     double yx=0.0;
-    n=((h->XnXn)-(h->XpXp))/2.0;
-    //y(x)=dotP(tmp,x) + n
-    printf("Klassifiziere 'positive Punkte'\n");
+    //y(x)=dotP(x-(Xp+Xn)/2,tmp)
+    fprintf(stderr,"Klassifiziere 'positive Punkte'\n");
     for(int i=0;i<s->count_p;i++){ //zunächst 'positive' klassifizieren
-        yx=dotP(tmp,s->sample_p[i]) +n;
+        pointSet(tmp,0.0);          //tmp auf 0 setzen
+        pointAdd(tmp,s->sample_p[i]);  //tmp= x
+        pointSub(tmp,a);            //tmp = x-a
+        yx=dotP(tmp,n);     //yx ) (x-a)*n
+        if(yx>=0){  //eine seite ebene
+            yx=1;
+        }else{      //andere seite
+            yx=0;
+        }
         printf("Class -> %lf\n",yx);
     }
-    printf("Ab jetzt nurnoch 'negative'\n");
+    fprintf(stderr,"Ab jetzt nurnoch 'negative'\n");
     for(int i=0;i<s->count_n;i++){
-        yx=dotP(tmp,s->sample_n[i]) +n;
+        pointSet(tmp,0.0);
+        pointAdd(tmp,s->sample_n[i]);
+        pointSub(tmp,a);
+        yx=dotP(tmp,n);
+        if(yx>=0){
+            yx=1;
+        }else{
+            yx=0;
+        }
         printf("Class -> %lf\n",yx);
     }
     printSamples(s);  //ausgeben der Klassifizierten Punkte
     destroyHuller(h);
     destroySamples(s);
+    destroyPoint(n);
+    destroyPoint(a);
     destroyPoint(tmp);
 }
 
