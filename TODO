@@ -1,20 +1,3 @@
-Modellgenerator:
--Alpha-Listen erstellen (performanz ++)
-
-
-Klassifizierer:
--Anhand des gegebenen Modells klassifizieren 
-=> Ebene in Normalform bringen:
-    (x-a)*n
-    n ( normalvektor) = Xp-Xn
-    a (punkt auf ebene) = (Xp+Xn)/2
-    x (zu klassifizieren)
-    Einsetzen.
-    => >0 -> Eine Seite;
-    => <0 -> Andere Seite;
-    => =0 -> Auf der Ebene (Sollte nich passieren)(>= nehmen für rest.)
-
-Wenn das erledigt ist:
--Testen auf Erkennungsrate
--Testen auf Performanz
--Eventuelle Optimierung
+-Testen auf Erkennungsrate  => a1a.t2 als referenz -> 75%
+-Vergleich mit libsvm?
+-Eventuelle Optimierung?
