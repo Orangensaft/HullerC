@@ -8,10 +8,12 @@
 #include <math.h>
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
-#define AVGCOUNT 100
+#define AVGCOUNT 500
 //Maximale Anzahl der Iterationen
-#define MAXITERATIONS 100
+#define MAXITERATIONS 100000
 // je größer desto genauer
+#define CONVERGE 100
+//anzahl alpha!=0 zum abbrechen
 
 int debug=0;
 
@@ -79,6 +81,7 @@ void printHuller(huller *h);
 void testHINIT();
 void alphaStats(samples *s);
 void loadHullerTest();
+int alphaNotNull(samples *s);
 
 int main(int argc, char **argv){
     srandom((int)time(NULL));
@@ -127,6 +130,7 @@ void learn(char* svmfile, int dim){
 
 void classify(char* svmfile, char* hulfile,int dim){
     huller *h=hullerFromFile(hulfile); //hullermodell einlesen
+    double rate=0.0;
     samples *s=createSamples();
     readSamples(svmfile,dim,s);
     point *tmp=createPoint(dim);
@@ -137,35 +141,44 @@ void classify(char* svmfile, char* hulfile,int dim){
     pointAdd(a,h->Xp);
     avgPoints(a,h->Xn); // a -> Ortsvektor (Xp+Xn)/2
     int classold=0;
+    int class=0;
     double yx=0.0;
     //y(x)=dotP(x-(Xp+Xn)/2,tmp)
     fprintf(stderr,"Klassifiziere 'positive Punkte'\n");
     for(int i=0;i<s->count_p;i++){ //zunächst 'positive' klassifizieren
+        classold=s->sample_p[i]->class;
         pointSet(tmp,0.0);          //tmp auf 0 setzen
         pointAdd(tmp,s->sample_p[i]);  //tmp= x
         pointSub(tmp,a);            //tmp = x-a
         yx=dotP(tmp,n);     //yx ) (x-a)*n
         if(yx>=0){  //eine seite ebene
-            yx=1;
+            class=1;
         }else{      //andere seite
-            yx=0;
+            class=0;
         }
-        printf("Class -> %lf\n",yx);
+        if(classold==class){ //richtig! treffer zählen.
+            rate=rate+1;
+        }
     }
     fprintf(stderr,"Ab jetzt nurnoch 'negative'\n");
     for(int i=0;i<s->count_n;i++){
+        classold=s->sample_n[i]->class;
         pointSet(tmp,0.0);
         pointAdd(tmp,s->sample_n[i]);
         pointSub(tmp,a);
         yx=dotP(tmp,n);
         if(yx>=0){
-            yx=1;
+            class=1;
         }else{
-            yx=0;
+            class=0;
         }
-        printf("Class -> %lf\n",yx);
+        if(classold==class){
+            rate=rate+1;
+        }
     }
     printSamples(s);  //ausgeben der Klassifizierten Punkte
+    fprintf(stderr,"Klassifizierung von %d Punkten abgeschlossen.\n",s->count_n+s->count_p);
+    fprintf(stderr,"Trefferquote: %lf %%\n",rate/(s->count_n+s->count_p)*100);    
     destroyHuller(h);
     destroySamples(s);
     destroyPoint(n);
@@ -471,6 +484,8 @@ point* randPoint(samples* s){
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
     for(int i=0;i<MAXITERATIONS;i++){
+        if(alphaNotNull(s) < CONVERGE)
+        break; //konvergiert, also beenden.
         if(i%(MAXITERATIONS/20)==0)
         fprintf(stderr,"Lerne... %lf%% (%d/%d) \n",(((double)i)/((double)MAXITERATIONS))*100,i,MAXITERATIONS);
         point* p=randPoint(s);
@@ -719,6 +734,19 @@ void testHINIT(){
     destroyHuller(h);
     destroySamples(s);
 
+}
+
+int alphaNotNull(samples *s){
+    int sumnotnull=0;
+    for(int i=0; i<s->count_n;i++){
+        if(s->sample_n[i]->alpha!=0)
+            sumnotnull=sumnotnull+1;
+    }
+    for(int i=0; i<s->count_p;i++){
+        if(s->sample_p[i]->alpha!=0)
+            sumnotnull=sumnotnull+1;
+    }
+    return sumnotnull;
 }
 
 void alphaStats(samples *s){
