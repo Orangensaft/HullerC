@@ -1,12 +1,3 @@
-Modellgenerator:
--Alpha-Listen erstellen (performanz ++)
-
-
-Klassifizierer:
--Anhand des gegebenen Modells klassifizieren            //punkte einlesen und mit ebene vergleichen (wie?)
-->Rausfinden wie wir das machen können
-
-Wenn das erledigt ist:
--Testen auf Erkennungsrate
--Testen auf Performanz
--Eventuelle Optimierung
+-Testen auf Erkennungsrate  => a1a.t2 als referenz -> 75%
+-Vergleich mit libsvm?
+-Eventuelle Optimierung?
