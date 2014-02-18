@@ -522,14 +522,14 @@ void mainHuller(huller* h, samples* s){
     }
     pointCopy(h->Xn,tmp);
     //funktion ausgeben
-    fprintf(stderr,"\ny(x)=(");
-    prettyPrint(h->Xp);
-    fprintf(stderr,"-");
-    prettyPrint(h->Xn);
-    fprintf(stderr,"x+%lf-%lf)/2\n",h->XnXn,h->XpXp);
+    //fprintf(stderr,"\ny(x)=(");
+    //prettyPrint(h->Xp);
+    //fprintf(stderr,"-");
+    //prettyPrint(h->Xn);
+    //fprintf(stderr,"x+%lf-%lf)/2\n",h->XnXn,h->XpXp);
     destroyPoint(tmp);
     destroyPoint(tmp2);
-    alphaStats(s);
+    //alphaStats(s);
 
 }
 

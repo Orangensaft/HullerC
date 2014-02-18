@@ -1,0 +1,42 @@
+#!/bin/sh
+#genauigkeiten
+for i in 1 2 3 4 
+do
+#zuerst libsvm
+./svm-train -q -v 10 a$i\a.svm
+#Dateien aufsplitten für huller
+python split.py a$i\a.svm
+#Jetzt Huller
+#block 1
+./huller learn bench/0.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 2
+./huller learn bench/1.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 3
+./huller learn bench/2.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 4
+./huller learn bench/3.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 5
+./huller learn bench/4.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 6
+./huller learn bench/5.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 7
+./huller learn bench/6.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 8
+./huller learn bench/7.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+#block 9
+./huller learn bench/8.svm 124 >modell.txt
+./huller classify bench/9.svm modell.txt 124 >out.t0
+done
+
+#Zeitvergleich
+#LIBSVM:
+time ./svm-train -q a1a.svm
+#huller
