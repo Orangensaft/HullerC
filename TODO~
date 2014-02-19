@@ -1,3 +1,1 @@
--Testen auf Erkennungsrate  => a1a.t2 als referenz -> 75%
--Vergleich mit libsvm?
--Eventuelle Optimierung?
+-Laufzeit Huller vs LIBSVM
