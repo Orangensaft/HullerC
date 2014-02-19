@@ -182,7 +182,7 @@ void initHuller(huller* h,samples* s){
     }
 }
 
-//Huller updaten
+//Huller updaten   index= index des punktes
 void updateHuller(huller* h, samples* s,point* xn){
     double Xpxn = dotP(h->Xp,xn);
     double Xnxn = dotP(h->Xn,xn);
@@ -190,22 +190,41 @@ void updateHuller(huller* h, samples* s,point* xn){
     double alpha_k = xn->alpha;
     double lambda_u=0.0;
     double lambda = 0.0;    
+    double alpha_old = 0.0;
+    //LAMBDA_U BERECHNEN
     if(xn->class==0){ //negativ Gleichung 5
         lambda_u = ((h->XnXn)-(h->XnXp)-Xnxn+Xpxn)/((h->XnXn)+xnxn-2*Xnxn);
     }else{  //positiv  Gleichung 4
         lambda_u = ((h->XpXp)-(h->XnXp)-Xpxn+Xnxn)/((h->XpXp)+xnxn-2*Xpxn);
     }
     lambda = min(1,max((-(xn->alpha))/(1-(xn->alpha)),lambda_u)); //lambda berechnen
+    //ALLE ALPHAS DER GLEICHEN KLASSE UPDATEN
     if(xn->class==0){
         for(int i=0;i<s->count_n;i++){
-            s->sample_n[i]->alpha=(1-lambda)*s->sample_n[i]->alpha;  //alpha_i = (1-l)*alpha_i
+            alpha_old = s->sample_n[i]->alpha;  //altes alpha speichern
+            s->sample_n[i]->alpha=(1-lambda)*s->sample_n[i]->alpha;  //alpha_i = (1-l)*alpha_i    = Alpha updaten
+            if(hasAlphaChanged(alpha_old,s->sample_n[i]->alpha)==1){   //hat sich das alpha verändert?
+                  switchPoint(s->n,i,s->sample_n[i]->alpha); //Ja; verschiebe anhand des alphas den index in die andere liste
+            }
         }
     }else{
        for(int i=0;i<s->count_p;i++){
+            alpha_old = s->sample_p[i]->alpha;
             s->sample_p[i]->alpha=(1-lambda)*s->sample_p[i]->alpha;  //das selbe nur für positiv
+            if(hasAlphaChanged(alpha_old,s->sample_p[i]->alpha)==1){
+                switchPoint(s->p,i,s->sample_p[i]->alpha);  //alphaliste der postiven ändern/updaten
+            }
         }
     }
+    alpha_old = xn->alpha;
     xn->alpha = alpha_k+lambda;     //alpha vorm aktuellen punkt updaten
+   /* if(hasAlphaChanged(alpha_old,xn->alpha)==1){   //falls sich alpha geändert hat
+        if(xn->class==0){
+            switchPoint(s->n,index,xn->alpha);
+        }else{
+            switchPoint(s->p,index,xn->alpha);
+        }
+    }*/
     if(xn->class==1){ //Update XpXp XnXp XnXn -> Gleichungen 7
         h->XpXp = (1-lambda)*(1-lambda)*(h->XpXp)+2*lambda*(1-lambda)*Xpxn+lambda*lambda*xnxn;
         h->XnXp = (1-lambda)*(h->XnXp)+lambda*Xnxn;

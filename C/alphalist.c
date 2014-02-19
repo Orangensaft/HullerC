@@ -54,6 +54,15 @@ void removeAlpha(alphalist *a,int i,double alpha){
         a->alphas_n=realloc(a->alphas_n,a->c_null*sizeof(int));
     }
 }
+int hasAlphaChanged(double alpha_old, double alpha_new){
+    if(alpha_old==0.0 && alpha_new!=0.0){   //alpha war null und ist jetzt ungleich null
+        return 1;
+    }
+    if(alpha_old!=0.0 && alpha_new==0.0){   //alpha war ungleich null und ist jetzt gleich null
+        return 1;
+    }
+    return 0;
+}
 //Alpha von punkt hat sich geändert (das wissen wir)
 void switchPoint(alphalist *a,int index, double alpha){
     if(alpha==0.0){ //alpha vom punkt 0 geworden

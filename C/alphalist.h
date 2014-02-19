@@ -23,6 +23,9 @@ void destroyAlphalist(alphalist *a);
 void addAlpha(alphalist *a,int index, double alpha);
 //element in o(1) aus liste löschen
 void removeAlpha(alphalist *a,int i,double alpha);
+//muss für den punkt das alpha geändert werden?
+int hasAlphaChanged(double alpha_old,double alpha_new);
+
 //Alpha von punkt hat sich geändert (das wissen wir)
 void switchPoint(alphalist *a,int index, double alpha);
 
