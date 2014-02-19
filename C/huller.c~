@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <math.h>
 //#include "point.h"
-#include "hullerutil.h"
+//#include "hullerutil.h"
 #include "alphalist.h"
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
@@ -40,20 +40,23 @@ void classify(char* svmfile, char* hulfile,int dim);
 void learn(char* svmfile,int dim);
 
 
+
+
 int main(int argc, char **argv){
     srandom((int)time(NULL));
     if(argc==1){
-        printf("Keine Argumente angegeben; Wechsele in Testmodus\n");
+        debug=1;
+        fprintf(stderr,"Keine Argumente angegeben; Wechsele in Testmodus\n");/*
         getchar();
         loadHullerTest();
-        //testHINIT();
-        //debug=1;
-        //testPoint();
-        //sampleTest();    
-        //testFile("testinput.svm",150);
-       // testAddComp();   
-        //testInit();
-        //completeTest();        
+        testHINIT();
+        testPoint();
+        sampleTest();    
+        testFile("a1a.svm",124);
+        testAddComp();   
+        testInit();
+        completeTest();    
+        */    
         exit(EXIT_SUCCESS);
     }  
     if(argc==4){
@@ -145,24 +148,8 @@ void classify(char* svmfile, char* hulfile,int dim){
     destroyPoint(tmp);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 //Huller initialisieren
 //Die Summe der alpha i (für positive) und alpha j (für negative) muss 1 sein
-//-> alpha_i = 1/count_p
-//-> alpha_j = 1/count_n
 void initHuller(huller* h,samples* s){
    //Avg von Punkten berechnen
    int k=0;
@@ -187,24 +174,6 @@ void initHuller(huller* h,samples* s){
     //Xp und Xn stehen jetzt. Jetzt noch Skalare berechen.
     updateScalars(h);
 }
-
-double min(double a, double b){
-    if(a<=b){
-        return a;
-    }else{
-    return b;
-    }
-}
-
-double max(double a, double b){
-    if(a>=b){
-        return a;
-    }else{
-        return b;
-    }
-}
-
-
 
 //Huller updaten
 void updateHuller(huller* h, samples* s,point* xn){
@@ -293,6 +262,15 @@ void mainHuller(huller* h, samples* s){
     //alphaStats(s);
 
 }
+
+
+
+
+
+
+
+
+
 
 
 
@@ -429,4 +407,21 @@ void loadHullerTest(){
     printHuller(h);
     destroyHuller(h);
 
+}
+
+
+double min(double a, double b){
+    if(a<=b){
+        return a;
+    }else{
+    return b;
+    }
+}
+
+double max(double a, double b){
+    if(a>=b){
+        return a;
+    }else{
+        return b;
+    }
 }

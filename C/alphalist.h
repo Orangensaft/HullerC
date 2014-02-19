@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "hullerutil.h"
 
 //doppelnennungen können nicht in einer alphaliste auftreten
 //=> Müssen daher nicht abgefangen werden.

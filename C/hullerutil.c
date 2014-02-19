@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "point.h"
+#include "alphalist.h"
 #include <stdlib.h>
 #include <math.h>
 #include <string.h>
@@ -11,6 +12,8 @@ typedef struct{
     int count_n;
     point **sample_p;  //ein array aus zeigern auf punkte (?)
     point **sample_n; //negative beispiele
+    alphalist *p;   //alphaliste der negativen punkte
+    alphalist *n;   //alphaliste der positiven punkte
 } samples;
 
 //Wichtige Daten für Huller
@@ -257,6 +260,8 @@ samples* createSamples(){
     s->count_p=0;
     s->sample_n=malloc(sizeof(point*));
     s->sample_p=malloc(sizeof(point*));
+    s->p=createAlphalist();
+    s->n=createAlphalist();
     return s;
 }
 
@@ -270,6 +275,8 @@ void destroySamples(samples* s){
     }
     free(s->sample_n);            //array von zeigern löschen
     free(s->sample_p);    
+    destroyAlphalist(s->n);
+    destroyAlphalist(s->p);
     free(s);                //s selbst löschen
 
 }
