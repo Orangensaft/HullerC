@@ -8,7 +8,7 @@
 #include <math.h>
 //#include "point.h"
 //#include "hullerutil.h"
-#include "alphalist.h"
+#include "hullerutil.h"
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
 #define AVGCOUNT 500
@@ -173,6 +173,13 @@ void initHuller(huller* h,samples* s){
     destroyPoint(tmp);
     //Xp und Xn stehen jetzt. Jetzt noch Skalare berechen.
     updateScalars(h);
+    //und zuletzt die Alphalisten erstellen
+    for(int i=0;i<s->count_p;i++){  //alle positiven durchiterieren
+       addAlpha(s->p,i,s->sample_p[i]->alpha);  //punkt in alpha-liste p packen
+    }
+    for(int i=0;i<s->count_n;i++){
+        addAlpha(s->n,i,s->sample_n[i]->alpha); //punkt in alpha-liste n packen
+    }
 }
 
 //Huller updaten

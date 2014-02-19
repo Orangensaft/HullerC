@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include "point.h"
+#include "alphalist.h"
 //Array aus count vielen Punkten
 typedef struct{
     int count_p;
     int count_n;
     point **sample_p;  //ein array aus zeigern auf punkte (?)
     point **sample_n; //negative beispiele
+    alphalist *p;   //alphaliste der negativen punkte
+    alphalist *n;   //alphaliste der positiven punkte
 } samples;
 
 //Wichtige Daten für Huller

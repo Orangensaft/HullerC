@@ -173,6 +173,13 @@ void initHuller(huller* h,samples* s){
     destroyPoint(tmp);
     //Xp und Xn stehen jetzt. Jetzt noch Skalare berechen.
     updateScalars(h);
+    //und zuletzt die Alphalisten erstellen
+    for(int i=0;i<s->count_p;i++){  //alle positiven durchiterieren
+       addAlpha(s->p,i,s->sample_p[i]->alpha);  //punkt in alpha-liste p packen
+    }
+    for(int i=0;i<s->count_n;i++){
+        addAlpha(s->n,i,s->sample_n[i]->alpha); //punkt in alpha-liste n packen
+    }
 }
 
 //Huller updaten
@@ -236,7 +243,7 @@ void mainHuller(huller* h, samples* s){
     //jetzt noch XP und XN ändern.
     point *tmp=createPoint(h->Xp->dim);
     point *tmp2=createPoint(h->Xp->dim);
-    for(int i=0;i<s->count_p;i++){  //Xp berechnen
+    for(int i=0;i<s->count_p;i++){  //Xp berechnen (Xp = sum_i(x_i*alpha_i)
         pointSet(tmp2,0);       //tmp2 leer
         pointAdd(tmp2,s->sample_p[i]);  //tmp2 = x
         pointMult(tmp2,s->sample_p[i]->alpha);    //tmp2 = x*alpha    
