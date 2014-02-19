@@ -7,7 +7,8 @@
 #include <assert.h>
 #include <math.h>
 //#include "point.h"
-#include "hullerutil.h"
+//#include "hullerutil.h"
+#include "alphalist.h"
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
 #define AVGCOUNT 500
