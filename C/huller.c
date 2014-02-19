@@ -241,6 +241,7 @@ void updateHuller(huller* h, samples* s,point* xn){
 //Haupte Hullerschleife
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
+    int dauer=0;
     for(int i=0;i<MAXITERATIONS;i++){
         if(alphaNotNull(s) < CONVERGE)
         break; //konvergiert, also beenden.
@@ -252,7 +253,9 @@ void mainHuller(huller* h, samples* s){
 
         point* r=randPoint(s,1); //zufälligen punkt mit alpha!=0
         updateHuller(h,s,r); //Update auf Punkt starten
+        dauer=i;
     }
+    fprintf(stderr,"Fertig nach %d Generationen\n",dauer);
     //jetzt noch XP und XN ändern.
     point *tmp=createPoint(h->Xp->dim);
     point *tmp2=createPoint(h->Xp->dim);
