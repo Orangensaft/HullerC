@@ -17,4 +17,5 @@ void pointAdd(point *p1, point *p2);
 void pointSub(point *p1, point *p2);
 void pointMult(point *p1,double n);
 void pointSet(point *p1,double n);
+void pointDiv(point *p1,double n);
 void prettyPrint(point* p);

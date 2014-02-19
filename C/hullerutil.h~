@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "point.h"
+#include "alphalist.h"
 //Array aus count vielen Punkten
 typedef struct{
     int count_p;

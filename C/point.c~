@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <assert.h>
-#include <stdio.h>
+#include <stdlib.h>
 #define debug 0
 
 typedef struct{

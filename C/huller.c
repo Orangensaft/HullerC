@@ -13,7 +13,7 @@
 //Anzahl der Punkte die für die Initialisierung genutzt werden
 #define AVGCOUNT 500
 //Maximale Anzahl der Iterationen
-#define MAXITERATIONS 100000
+#define MAXITERATIONS 1000000
 // je größer desto genauer
 #define CONVERGE 100
 //anzahl alpha!=0 zum abbrechen
@@ -218,13 +218,13 @@ void updateHuller(huller* h, samples* s,point* xn){
     }
     alpha_old = xn->alpha;
     xn->alpha = alpha_k+lambda;     //alpha vorm aktuellen punkt updaten
-   /* if(hasAlphaChanged(alpha_old,xn->alpha)==1){   //falls sich alpha geändert hat
+    if(hasAlphaChanged(alpha_old,xn->alpha)==1){   //falls sich alpha geändert hat
         if(xn->class==0){
-            switchPoint(s->n,index,xn->alpha);
+            switchPoint(s->n,xn->index,xn->alpha); //alphaliste n updaten (weil xn negativ ist), index von xn ist in xn gespeichert
         }else{
-            switchPoint(s->p,index,xn->alpha);
+            switchPoint(s->p,xn->index,xn->alpha);
         }
-    }*/
+    }
     if(xn->class==1){ //Update XpXp XnXp XnXn -> Gleichungen 7
         h->XpXp = (1-lambda)*(1-lambda)*(h->XpXp)+2*lambda*(1-lambda)*Xpxn+lambda*lambda*xnxn;
         h->XnXp = (1-lambda)*(h->XnXp)+lambda*Xnxn;
@@ -246,17 +246,11 @@ void mainHuller(huller* h, samples* s){
         break; //konvergiert, also beenden.
         if(i%(MAXITERATIONS/20)==0)
         fprintf(stderr,"Lerne... %lf%% (%d/%d) \n",(((double)i)/((double)MAXITERATIONS))*100,i,MAXITERATIONS);
-        point* p=randPoint(s);
-        //alphaStats(s);
-        while(p->alpha!=0){  //Solange random bis wir einen punkt mit alpha=0 finden
-            p=randPoint(s);
-        }
-        updateHuller(h,s,p); //Update auf Punkt starten
-        point* r=randPoint(s);
-        //alphaStats(s);
-        while(r->alpha==0){  //Zufälligen punkt mit alpha != 0 suchen
-            r=randPoint(s);
-        }
+        
+        point* p=randPoint(s,0); //zufälligen punkt mit alpha=0
+        updateHuller(h,s,p);
+
+        point* r=randPoint(s,1); //zufälligen punkt mit alpha!=0
         updateHuller(h,s,r); //Update auf Punkt starten
     }
     //jetzt noch XP und XN ändern.
@@ -285,7 +279,7 @@ void mainHuller(huller* h, samples* s){
     //fprintf(stderr,"x+%lf-%lf)/2\n",h->XnXn,h->XpXp);
     destroyPoint(tmp);
     destroyPoint(tmp2);
-    //alphaStats(s);
+    alphaStats(s);
 
 }
 
@@ -404,7 +398,7 @@ void sampleTest(){
     getchar();
     printf("\n\nJetzt ein paar zufällige Punkte aus Samples:\n\n");
     for(int i=0;i<10;i++){
-        printPoint(randPoint(s));
+        printPoint(randPoint(s,random()%2));
     }    
     destroySamples(s);
     getchar();

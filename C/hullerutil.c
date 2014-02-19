@@ -106,17 +106,65 @@ huller *hullerFromFile(char* file){
 
 //Aus einem Sample einen zufälligen Punkt ziehen (kann positiv oder negativ sein)
 //Gibt pointer auf punkt zurück.
-point* randPoint(samples* s){
-    int k=0;    
-    k=random()%2; //positiver oder negativer punkt?
-    if(k==0){
-     k=random()%(s->count_n);
-     return (s->sample_n[k]);   
+//alpha: 0 -> alpha=0 sonst: alpha!=0
+//gehe davon aus, dass es positive und negative punkte gibt. (Sonst wäre die ganze analyse sinnlos)
+point* randPoint(samples* s,int alpha){
+    int flag=0;    //alles okay
+    if(alpha==0){
+        if(s->p->c_null==0){ //es gibt keine positiven punkte mit alpha=0
+            flag=1;  //keine x in p, alpha=0
+        }
+        if(s->n->c_null==0){
+            if(flag==1){    //es gibt keine positiven und keine negativen mit alpha=0
+                fprintf(stderr,"Kritischer FEHLER! Es gibt keine Punkte mehr mit alpha=0\n");
+                exit(0);    //programm beenden
+            }
+            flag=2; //keine x in n, alpha=0
+        }
+    }else{
+        if(s->p->c_notnull==0){
+            flag=1;  //keine x in p, alpha!=0
+        }
+        if(s->n->c_notnull==0){
+            if(flag==1){
+                fprintf(stderr,"Kritischer FEHLER! Es gibt keine Punkte mehr mit alpha!=0\n");
+                exit(0);
+            }
+            flag=2; //keine x in n, alpha!=0
+        }
+        
     }
-    else{
-      k=random()%(s->count_p);
-      return (s->sample_p[k]);
+    //flag hat jetzt einen wert, der uns sagt welche liste wir benutzen dürfen.
+    int k=0; //von welcher liste wollen wir unsere punkte? k=0 ->n ; k=1 ->p
+    int index=0;
+    k=random()%2; //k ist jetzt 0 oder 1  
+    if(flag==1){ //es gibt keine passenden punkte in p.
+        k=0; //nimm n.
     }
+    if(flag==2){    //es gibt keine passende punkte in n
+        k=1;    //nimm p.
+    }
+        if(k==1){ // Wir ziehen aus p
+           if(alpha==0){ //falls wir einen (positiven) punkt mit alpha=0 wollen
+                index=s->p->alphas_n[random()%(s->p->c_null)]; // s->sample_p[index] ist jetzt unser punkt.
+                s->sample_p[index]->index=index; //im punkt den index speichern.
+                return s->sample_p[index]; 
+           }else{ //wir wollen einen (positiven) punkt mit alpha!=0
+                index=s->p->alphas_nn[random()%(s->p->c_notnull)];
+                s->sample_p[index]->index=index;
+                return s->sample_p[index];
+           }
+        }else{  // Wir ziehen aus n
+            if(alpha==0){
+                index=s->n->alphas_n[random()%(s->n->c_null)];
+                s->sample_n[index]->index=index;
+                return s->sample_n[index];
+            }else{
+                index=s->n->alphas_nn[random()%(s->n->c_notnull)];
+                s->sample_n[index]->index=index;
+                return s->sample_n[index];
+            }
+        }    
 }
 
 void printHuller(huller *h){

@@ -28,7 +28,7 @@ void destroyHuller(huller *h);
 huller *createHuller(int dim); 
 huller *hullerFromFile(char* file);
 void updateScalars(huller *h);
-point* randPoint(samples* s);
+point* randPoint(samples* s,int alpha);
 void printSamples(samples* s);
 void printHuller(huller *h);
 void alphaStats(samples *s);

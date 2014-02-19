@@ -8,6 +8,7 @@ typedef struct{
 	int dim;
     int class; //0 -> -; 1 -> +;
     double alpha;
+    int index; //nur temporär für alphalisten genutzt
 } point;
 
 //punkt im dim-dimensionalen raum erstellen
@@ -18,6 +19,7 @@ point *createPoint(int dim){
 	p->coords=calloc(dim,sizeof(double)); //speicher für double-array (dim*sizeof(double))
     p->class=0;
     p->alpha=0;
+    p->index=0;
 	return p;
 }
 

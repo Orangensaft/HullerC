@@ -106,17 +106,34 @@ huller *hullerFromFile(char* file){
 
 //Aus einem Sample einen zufälligen Punkt ziehen (kann positiv oder negativ sein)
 //Gibt pointer auf punkt zurück.
-point* randPoint(samples* s){
-    int k=0;    
-    k=random()%2; //positiver oder negativer punkt?
-    if(k==0){
-     k=random()%(s->count_n);
-     return (s->sample_n[k]);   
-    }
-    else{
-      k=random()%(s->count_p);
-      return (s->sample_p[k]);
-    }
+//alpha: 0 -> alpha=0 sonst: alpha!=0
+//gehe davon aus, dass es positive und negative punkte gibt. (Sonst wäre die ganze analyse sinnlos)
+point* randPoint(samples* s,int alpha,int class){
+    int k=0; //von welcher liste wollen wir unsere punkte? k=0 ->n ; k=1 ->p
+    int index=0;
+    assert(s->count_n>0 || s->count_p>0); // eine der mengen muss einen punkt beinhalten
+    k=random()%2; //k ist jetzt 0 oder 1  
+        if(k==1){ // Wir ziehen aus p
+           if(alpha==0){ //falls wir einen (positiven) punkt mit alpha=0 wollen
+                index=s->p->alphas_n[random()%(s->p->c_null)]; // s->sample_p[index] ist jetzt unser punkt.
+                s->sample_p[index]->index=index; //im punkt den index speichern.
+                return s->sample_p[index]; 
+           }else{ //wir wollen einen (positiven) punkt mit alpha!=0
+                index=s->p->alphas_nn[random()%(s->p->c_notnull)];
+                s->sample_p[index]->index=index;
+                return s->sample_p[index];
+           }
+        }else{  // Wir ziehen aus n
+            if(alpha==0){
+                index=s->n->alphas_n[random()%(s->n->c_null)];
+                s->sample_n[index]->index=index;
+                return s->sample_n[index];
+            }else{
+                index=s->n->alphas_nn[random()%(s->n->c_notnull)];
+                s->sample_n[index]->index=index;
+                return s->sample_n[index];
+            }
+        }    
 }
 
 void printHuller(huller *h){

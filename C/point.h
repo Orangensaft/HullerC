@@ -3,6 +3,7 @@ typedef struct{
     int dim;
     int class;
     double alpha;
+    int index;
 } point;
 
 point *createPoint(int dim);
