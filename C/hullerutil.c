@@ -25,6 +25,32 @@ typedef struct{
    double XnXn;
 } huller;
 
+//struct um alphas vernünftig zu kopieren und zu vergleichen
+typedef struct{
+    int n;
+    double *alphas;
+} alphacompare;
+
+alphacompare *createAlphac(samples* s){
+    alphacompare *a = malloc(sizeof(alphacompare));
+    a->alphas=calloc(s->count_n+s->count_p,sizeof(double)); //anzahl der punkte viele alphas erstellen
+    a->n=0; //es sind zur zeit 0 alphas gespeichert
+    for(int i=0;i<s->count_p;i++){
+        a->alphas[a->n]=s->sample_p[i]->alpha;  //postive punkte alphas rein tun
+        a->n=a->n+1;
+    }
+    for(int i=0;i<s->count_n;i++){
+        a->alphas[a->n]=s->sample_n[i]->alpha; //negative punkte alphas rein tun
+        a->n=a->n+1;
+    }
+    return a;
+}
+
+void destroyAlphac(alphacompare* a){
+    free(a->alphas);
+    free(a);
+}
+
 //Konstruktor für Huller
 huller *createHuller(int dim){
     huller *h = malloc(sizeof(huller));

@@ -11,6 +11,11 @@ typedef struct{
     alphalist *n;   //alphaliste der positiven punkte
 } samples;
 
+typedef struct{
+    int n;
+    double *alphas;
+} alphacompare;
+
 //Wichtige Daten für Huller
 typedef struct{
    point *Xp;
@@ -20,6 +25,8 @@ typedef struct{
    double XnXn;
 } huller;
 
+alphacompare *createAlphac(samples* s);
+void destroyAlphac(alphacompare* a);
 samples* createSamples();
 void sampleAdd(samples* s,point* p);
 void readSamples(char *file,int dim,samples *s);
