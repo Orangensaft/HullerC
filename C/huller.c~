@@ -15,11 +15,11 @@
 //Maximale Anzahl der Iterationen
 #define MAXITERATIONS 100000
 // je größer desto genauer
-#define ALPHACONV 10
+#define ALPHACONV 128
 //Wie lange müssen die Alphas um epsilon gleich sein, damit wir terminieren
 #define XPXNCONV 256
 //wie lange müssen xp und np gleich bleiben // NICHT AUSSAGEKRÄFTIG GENUG!
-#define EPSILON 0.0005
+#define EPSILON 0.0000000001
 //epsilon; liegt die Änderung in diesem Bereich gehen wir von keine signifikanten Änderung aus
 
 int debug=0;

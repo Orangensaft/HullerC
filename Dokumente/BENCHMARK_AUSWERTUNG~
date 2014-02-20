@@ -1,0 +1,89 @@
+Trefferquote mit ALPHACONV=16 und EPSILON=0,0000000001
+
+Datenset I
+LIBSVM:Cross Validation Accuracy = 82.5545%
+
+Huller:
+Trefferquote: 74.143070 %
+Trefferquote: 31.594635 %
+Trefferquote: 67.809240 %
+Trefferquote: 71.833085 %
+Trefferquote: 48.211624 %
+Trefferquote: 24.813711 %
+Trefferquote: 68.330849 %
+Trefferquote: 74.515648 %
+Trefferquote: 73.323398 %
+=>59,37
+
+Datenset II
+
+LIBSVM:Cross Validation Accuracy = 81.6336%
+
+Huller:
+Trefferquote: 74.489796 %
+Trefferquote: 73.979592 %
+Trefferquote: 73.915816 %
+Kritischer FEHLER! Es gibt keine Punkte mehr mit alpha!=0
+Trefferquote: 73.724490 %
+Trefferquote: 44.961735 %
+Trefferquote: 62.181122 %
+Trefferquote: 74.489796 %
+Trefferquote: 74.489796 %
+=>69%
+
+Datenset III
+
+LIBSVM:Cross Validation Accuracy = 83.2967%
+
+Huller:
+Trefferquote: 71.633086 %
+Trefferquote: 67.815483 %
+Kritischer FEHLER! Es gibt keine Punkte mehr mit alpha!=0
+Trefferquote: 74.549311 %
+Trefferquote: 74.708378 %
+Trefferquote: 74.708378 %
+Trefferquote: 74.708378 %
+Kritischer FEHLER! Es gibt keine Punkte mehr mit alpha!=0
+Trefferquote: 68.981972 %
+=>72%
+
+
+Datenset IV
+
+LIBSVM:Cross Validation Accuracy = 83.5599%
+
+Huller:
+Trefferquote: 67.597293 %
+Trefferquote: 25.380711 %
+Trefferquote: 74.619289 %
+Trefferquote: 25.380711 %
+Trefferquote: 25.380711 %
+Trefferquote: 74.619289 %
+Trefferquote: 25.380711 %
+Trefferquote: 74.619289 %
+Trefferquote: 74.619289 %
+=>52%
+
+Laufzeit:
+Huller (nehme laufzeit lernen + klassifizieren)(Epsilon und ALPHACONV wie oben)
+Datei: a1a.t2   (~31k Einträge)
+1.229s + 0.397s = 1.626s
+
+LIBSVM (Gemessen mit svm-train ohne parameter)
+56.712s
+
+Ermittlung der IPC mit perf
+->Aufruf:
+perf stat -B -r 5 ./huller learn a1a.t2 124 >m
+Ergebnis: (gekürzt)
+     5.680.286.198 instructions              #    1,35  insns per cycle
+Somit ergibt sich eine IPC-Zahl von 1.35
+
+
+Alphaconv    -   Trefferquote
+1           -   29,38%
+2           -   27,5%
+4           -   34,6%
+8           .   74,8%
+16          -   75,9%
+

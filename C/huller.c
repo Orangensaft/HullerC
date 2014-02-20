@@ -15,7 +15,7 @@
 //Maximale Anzahl der Iterationen
 #define MAXITERATIONS 100000
 // je größer desto genauer
-#define ALPHACONV 10
+#define ALPHACONV 16
 //Wie lange müssen die Alphas um epsilon gleich sein, damit wir terminieren
 #define XPXNCONV 256
 //wie lange müssen xp und np gleich bleiben // NICHT AUSSAGEKRÄFTIG GENUG!

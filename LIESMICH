@@ -1,0 +1,26 @@
+Zu den Ordnern:
+
+C/
+Enthält unseren Code.
+./huller ist das Hauptprogramm, die restlichen .c Dateien sind die Datenstrukturen etc.
+Die .svm und .t .t2 Dateien sind Testdatenmengen (Dimension 124)
+./build.sh zum compilen
+./test X    zum testen der Trefferquote mit huller_X, wobei X ALPHACONV entspricht
+
+Dokumente:
+Entthält alle wichtigen Dokumente.
+BENCHMARK_AUSWERTUNG enthhält die Benchmark auswertungen
+ecml-2005.pdf ist das Paper
+Normalenform.pdf erklärt die normalenform
+Projektplan.pdf und Ubenannt 1.odt ist unser Projektplan
+
+libsvm-3.17/
+Enthält libsvm.
+Einzig genutzter Ordner:    python
+Dort zu finden:
+Diverse Testmengen
+./benchmark.sh  startet den Benchmark
+split.py    splittet einen svm Datei ein 10 gleich große Blöcke
+svm-train   svmlib implementierung
+
+

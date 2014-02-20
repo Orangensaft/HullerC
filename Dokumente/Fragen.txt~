@@ -1,0 +1,24 @@
+Startwerte der Alpha?
+
+Sind alle Alpha = 0 so wird im ersten durchlauf logischerweise ein punkt mit alpha=0 gefunden
+dieser erhält einen neuen wert durch a'=a+lambda
+
+Alle anderen Alphas bleiben auf 0, wegen a'=(1-lambda)*a   <- a=0   => a'=0;
+
+Der Zweite Punkt (alpha!=0) wird nach langer zeit (weil zufällig) gefunden, und ist der Punkt
+der vorher gefunden wurde (ist ja der einzige bei dem alpha !=0 ist.
+
+Bei diesem wird dann wieder das Lambda geändert, die anderen ändern sich nicht.
+
+Erst beim nächsten durchlauf wird ein Weiterer Punkt zu alpha!=0 geändert.
+
+Das macht wenig sinn wegen sum(alpha_i)=1 und sum(alpha_j)=1.
+
+Macht ausserdem wenig sinn, weil durch das Random unter umständen sehr lange gewartet werden muss
+bis man einen Punkt findet für den alpha!=0 gilt. (eventuell in einer extra liste speichern?)
+
+
+##############
+
+
+Liegen wir richtig dass sich Xn und Xp NIE ändern? Ausser am anfang bei init?
