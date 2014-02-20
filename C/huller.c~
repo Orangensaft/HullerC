@@ -17,7 +17,7 @@
 // je größer desto genauer
 #define ALPHACONV 1000
 //Wie lange müssen die Anzahl der Alphas gleich damit wir terminieren (nicht aussagekräftig.)
-#define XPXNCONV 5
+#define XPXNCONV 128
 //wie lange müssen xp und np gleich bleiben
 #define EPSILON 0.000005
 //epsilon; liegt die Änderung in diesem Bereich gehen wir von keine signifikanten Änderung aus
