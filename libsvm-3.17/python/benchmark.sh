@@ -38,5 +38,7 @@ done
 
 #Zeitvergleich
 #LIBSVM:
-time ./svm-train -q a1a.svm
+#time ./svm-train -q a1a.svm
 #huller
+#time ./huller learn a1a.svm 124 >modell.txt
+#time ./huller classify a1a.svm modell.txt 124

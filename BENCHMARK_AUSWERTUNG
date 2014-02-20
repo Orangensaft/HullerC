@@ -1,0 +1,82 @@
+Trefferquote mit XPXNCONV=5 und EPSILON=0,000005
+
+Datensatz I
+LIBSVM:
+Cross Validation Accuracy = 82.5545%
+
+Huller:
+Trefferquote: 71.875000 %
+Trefferquote: 68.750000 %
+Trefferquote: 68.750000 %
+Trefferquote: 25.625000 %
+Trefferquote: 68.750000 %
+Trefferquote: 74.375000 %
+Trefferquote: 30.000000 %
+Trefferquote: 53.125000 %
+Trefferquote: 67.500000 %
+=>Gesamt 58.75%
+
+Datensatz II
+LIBSVM:
+Cross Validation Accuracy = 81.6336%
+
+Huller:
+Trefferquote: 54.922280 %
+Trefferquote: 69.948187 %
+Trefferquote: 59.844560 %
+Trefferquote: 58.031088 %
+Trefferquote: 38.341969 %
+Trefferquote: 61.398964 %
+Trefferquote: 59.844560 %
+Trefferquote: 59.585492 %
+Trefferquote: 66.062176 %
+=>Gesamt 51,84
+
+Datensatz III
+LIBSVM:
+Cross Validation Accuracy = 83.2967%
+
+Huller:
+Trefferquote: 54.971591 %
+Trefferquote: 71.732955 %
+Trefferquote: 40.482955 %
+Trefferquote: 70.170455 %
+Trefferquote: 48.011364 %
+Trefferquote: 60.227273 %
+Trefferquote: 53.125000 %
+Trefferquote: 42.471591 %
+Trefferquote: 36.363636 %
+Gesamt=> 53,10
+
+Datensatz IV
+LIBSVM:
+Cross Validation Accuracy = 83.5599%
+
+Huller:
+Trefferquote: 29.526227 %
+Trefferquote: 40.609137 %
+Trefferquote: 49.830795 %
+Trefferquote: 57.445008 %
+Trefferquote: 53.722504 %
+Trefferquote: 72.758037 %
+Trefferquote: 61.082910 %
+Trefferquote: 63.705584 %
+Trefferquote: 50.592217 %
+=> Gesamt 53.25
+
+Laufzeit:
+Huller (nehme laufzeit lernen + klassifizieren)(Epsilon und XPXPCONV wie oben)
+Datei: a1a.t2   (~31k Einträge)
+1.229s + 0.397s = 1.626s
+
+LIBSVM (Gemessen mit svm-train ohne parameter)
+56.712s
+
+Ermittlung der IPC mit perf
+->Aufruf:
+perf stat -B -r 5 ./huller learn a1a.t2 124 >m
+Ergebnis: (gekürzt)
+     5.680.286.198 instructions              #    1,35  insns per cycle
+Somit ergibt sich eine IPC-Zahl von 1.35
+
+

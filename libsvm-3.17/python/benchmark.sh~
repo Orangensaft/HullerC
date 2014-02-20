@@ -35,3 +35,10 @@ python split.py a$i\a.svm
 ./huller learn bench/8.svm 124 >modell.txt
 ./huller classify bench/9.svm modell.txt 124 >out.t0
 done
+
+#Zeitvergleich
+#LIBSVM:
+time ./svm-train -q a1a.svm
+#huller
+time ./huller learn a1a.svm 124 >modell.txt
+time ./huller learn classify a1a.svm modell.txt 124
