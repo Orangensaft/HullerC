@@ -26,6 +26,7 @@ typedef struct{
 } huller;
 
 //struct um alphas vernünftig zu kopieren und zu vergleichen
+//zuerst alle p_alphas dann alle n_alphas
 typedef struct{
     int n;
     double *alphas;
@@ -44,6 +45,18 @@ alphacompare *createAlphac(samples* s){
         a->n=a->n+1;
     }
     return a;
+}
+
+void refreshAlphas(samples* s, alphacompare* a){
+    int n=0;
+    for(int i=0;i<s->count_p;i++){
+        a->alphas[n]=s->sample_p[i]->alpha;
+        n=n+1;
+    }
+    for(int i=0;i<s->count_n;i++){
+        a->alphas[n]=s->sample_n[i]->alpha;
+        n=n+1;
+    }
 }
 
 void destroyAlphac(alphacompare* a){

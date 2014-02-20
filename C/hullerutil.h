@@ -26,6 +26,7 @@ typedef struct{
 } huller;
 
 alphacompare *createAlphac(samples* s);
+void refreshAlphas(samples* s, alphacompare* a);
 void destroyAlphac(alphacompare* a);
 samples* createSamples();
 void sampleAdd(samples* s,point* p);

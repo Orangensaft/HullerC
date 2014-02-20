@@ -11,11 +11,11 @@
 #include "hullerutil.h"
 //Konstanten
 //Anzahl der Punkte die für die Initialisierung genutzt werden
-#define AVGCOUNT 500
+#define AVGCOUNT 250
 //Maximale Anzahl der Iterationen
-#define MAXITERATIONS 1000000
+#define MAXITERATIONS 100000
 // je größer desto genauer
-#define ALPHACONV 1000
+#define ALPHACONV 10
 //Wie lange müssen die Alphas um epsilon gleich sein, damit wir terminieren
 #define XPXNCONV 256
 //wie lange müssen xp und np gleich bleiben // NICHT AUSSAGEKRÄFTIG GENUG!
@@ -42,7 +42,7 @@ double max(double a, double b);
 double min(double a, double b); 
 void classify(char* svmfile, char* hulfile,int dim);    //Klassifizierer
 void learn(char* svmfile,int dim);      //Modellgenerator
-int alphasChanged(samples *s,alphacompare *ac)  //Abbruchkriterium alphas verändern sich nicht mehr
+int alphasChanged(samples *s,alphacompare *ac);  //Abbruchkriterium alphas verändern sich nicht mehr
 
 
 
@@ -250,10 +250,14 @@ void mainHuller(huller* h, samples* s){
     int nochange_alpha=0;   //Wie lange hat sich die alphaverteilung nicht geändert
     int reason=0;   //abbruchgrund (0: MAXITERATIONS erreicht, 1:Xp und Xn konvergieren, 2:Anzahl Alphas bleiben konstant
     alphacompare *ac = createAlphac(s); //in ac sind jetzt ALLE alphas.
-    for(int i=0;i<MAXITERATIONS;i++){
+    for(int i=0;i<=MAXITERATIONS;i++){
         if(i%(MAXITERATIONS/20)==0) //Alle 5% Auskunft geben
         fprintf(stderr,"Lerne... %lf%% (%d/%d) \n",(((double)i)/((double)MAXITERATIONS))*100,i,MAXITERATIONS);
 
+        if(nochange_alpha==ALPHACONV){
+            reason=1;
+            break;
+        }
 
         point* p=randPoint(s,0); //zufälligen punkt mit alpha=0
         updateHuller(h,s,p);
@@ -261,6 +265,11 @@ void mainHuller(huller* h, samples* s){
         point* r=randPoint(s,1); //zufälligen punkt mit alpha!=0
         updateHuller(h,s,r); //Update auf Punkt starten
 
+        if(alphasChanged(s,ac)==0){
+        nochange_alpha=nochange_alpha+1;
+        }else{
+        nochange_alpha=0;
+        }
 
         dauer=i;
     }
@@ -269,9 +278,7 @@ void mainHuller(huller* h, samples* s){
     if(reason==0)
     fprintf(stderr,"->MAXITERATIONS erreicht\n");
     if(reason==1)
-    fprintf(stderr,"->Xp und Xn über %d Generationen nahezu konstant\n",XPXNCONV);
-    if(reason==2)
-    fprintf(stderr,"Anzahl Stützvektoren konstant über %d Generationen\n",ALPHACONV);
+    fprintf(stderr,"->Alphas über %d Generationen nahezu konstant\n",ALPHACONV);
     //jetzt noch XP und XN ändern.
     point *tmp=createPoint(h->Xp->dim);
     point *tmp2=createPoint(h->Xp->dim);
@@ -292,34 +299,28 @@ void mainHuller(huller* h, samples* s){
     pointCopy(h->Xn,tmp);
     destroyPoint(tmp);
     destroyPoint(tmp2);
+    destroyAlphac(ac);
     alphaStats(s);
 
 }
 //testen ob sich irgendein Alpha signifikant geändert hat
 int alphasChanged(samples *s,alphacompare *ac){
     int n=0;
-    alphacompare *tmp;
     for(int i=0;i<s->count_p;i++){
         if(fabs(ac->alphas[n] - s->sample_p[i]->alpha)>=EPSILON){
-            tmp=ac;  //tmp zeigt auf das alte struct
-            ac=createAlphac(s); //ac zeigt auf das neue struct mit aktuellen werten
-            free(tmp);  //das alte struct löschen
+            refreshAlphas(s,ac);
             return 1;
         }
         n=n+1;
     }
     for(int i=0;i<s->count_n;i++){
         if(fabs(ac->alphas[n] - s->sample_n[i]->alpha)>=EPSILON){
-            tmp=ac;  //tmp zeigt auf das alte struct
-            ac=createAlphac(s); //ac zeigt auf das neue struct mit aktuellen werten
-            free(tmp);  //das alte struct löschen
+            refreshAlphas(s,ac);
             return 1;
         }
         n=n+1;
     }
-    tmp=ac;  //tmp zeigt auf das alte struct
-    ac=createAlphac(s); //ac zeigt auf das neue struct mit aktuellen werten
-    free(tmp);  //das alte struct löschen
+    refreshAlphas(s,ac);
     return 0;
 }
 
