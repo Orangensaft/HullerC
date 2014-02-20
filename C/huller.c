@@ -15,8 +15,12 @@
 //Maximale Anzahl der Iterationen
 #define MAXITERATIONS 1000000
 // je größer desto genauer
-#define CONVERGE 100
-//anzahl alpha!=0 zum abbrechen
+#define ALPHACONV 1000
+//Wie lange müssen die Anzahl der Alphas gleich damit wir terminieren (nicht aussagekräftig.)
+#define XPXNCONV 10
+//wie lange müssen xp und np gleich bleiben
+#define EPSILON 0.000005
+//epsilon; liegt die Änderung in diesem Bereich gehen wir von keine signifikanten Änderung aus
 
 int debug=0;
 
@@ -31,13 +35,14 @@ void testInit();
 void completeTest();
 //Tests ENDE
 
-void initHuller(huller* h,samples* s);
-void mainHuller(huller* h, samples* s);
-void updateHuller(huller* h, samples* s,point* xn);
+void initHuller(huller* h,samples* s);      //siehe paper
+void mainHuller(huller* h, samples* s);     //siehe paper 
+void updateHuller(huller* h, samples* s,point* xn); //siehe paper
 double max(double a, double b);
-double min(double a, double b);
-void classify(char* svmfile, char* hulfile,int dim);
-void learn(char* svmfile,int dim);
+double min(double a, double b); 
+void classify(char* svmfile, char* hulfile,int dim);    //Klassifizierer
+void learn(char* svmfile,int dim);      //Modellgenerator
+int xpxnChanged(huller *h,double oldxpxp, double oldxnxn);  //Abbruchkriterium Xp Xn konvergieren
 
 
 
@@ -80,7 +85,7 @@ void learn(char* svmfile, int dim){
     huller *h=createHuller(dim);
     samples *s=createSamples();
     readSamples(svmfile,dim,s);
-    fprintf(stderr,"Samples eingelesen. Starte Huller\n");
+    fprintf(stderr,"Samples eingelesen. Starte Huller mit EPSILON=%lf\n",EPSILON);
     mainHuller(h,s);
     fprintf(stderr,"Huller fertig.\n");
     printHuller(h);
@@ -241,21 +246,58 @@ void updateHuller(huller* h, samples* s,point* xn){
 //Haupte Hullerschleife
 void mainHuller(huller* h, samples* s){
     initHuller(h,s);    //Huller initialisieren
-    int dauer=0;
+    int dauer=0;    //Zähler der Iterationen
+    int nochange_xpxn=0;    //Wie lange hat sich xpxn nicht verändert
+  //  int nochange_alpha=0;   //Wie lange hat sich die alphaverteilung nicht geändert
+    double xnxnold=h->XnXn;
+    double xpxpold=h->XpXp;
+  //  int alphaold=0;     //anzahl der alpha=0
+    int reason=0;   //abbruchgrund (0: MAXITERATIONS erreicht, 1:Xp und Xn konvergieren, 2:Anzahl Alphas bleiben konstant
     for(int i=0;i<MAXITERATIONS;i++){
-        if(alphaNotNull(s) < CONVERGE)
-        break; //konvergiert, also beenden.
-        if(i%(MAXITERATIONS/20)==0)
+        if(i%(MAXITERATIONS/20)==0) //Alle 5% Auskunft geben
         fprintf(stderr,"Lerne... %lf%% (%d/%d) \n",(((double)i)/((double)MAXITERATIONS))*100,i,MAXITERATIONS);
         
+        if(nochange_xpxn==XPXNCONV){
+            reason=1;
+            break;      //Xp und Xn konvergieren
+        }
+        /*
+        if(nochange_alpha==ALPHACONV){
+            reason=2;                   NICHT AUSSAGEKRÄFT -> Anzahl Alphas kann gleich bleiben, Gewichte aber variieren
+            break;
+        }
+        */
         point* p=randPoint(s,0); //zufälligen punkt mit alpha=0
         updateHuller(h,s,p);
 
         point* r=randPoint(s,1); //zufälligen punkt mit alpha!=0
         updateHuller(h,s,r); //Update auf Punkt starten
+        
+        if(xpxnChanged(h,xpxpold,xnxnold)==0){  //hat sich xnxn xpxp nicht signifikant verändert? (krit 1)
+            nochange_xpxn=nochange_xpxn+1;
+        }else{
+            nochange_xpxn=0;    //falls nicht, zähler zurücksetzen
+        }
+        xnxnold=h->XnXn;    //der aktuelle wert wird zum alten in der kommenden generation
+        xpxpold=h->XpXp;
+        /*
+        if(s->p->c_notnull+s->n->c_notnull==alphaold){  //hat sich die anzahl der stützvektoren nicht verändert (krit 2)
+            nochange_alpha=nochange_alpha+1; 
+        }else{
+            nochange_alpha=0;
+        }
+        alphaold=s->p->c_notnull+s->n->c_notnull;
+        */
         dauer=i;
     }
-    fprintf(stderr,"Fertig nach %d Generationen\n",dauer);
+    
+    fprintf(stderr,"\n\nFertig nach %d Generationen\n",dauer);
+    if(reason==0)
+    fprintf(stderr,"->MAXITERATIONS erreicht\n");
+    if(reason==1)
+    fprintf(stderr,"->Xp und Xn über %d Generationen nahezu konstant\n",XPXNCONV);
+    if(reason==2)
+    fprintf(stderr,"Anzahl Stützvektoren konstant über %d Generationen\n",ALPHACONV);
     //jetzt noch XP und XN ändern.
     point *tmp=createPoint(h->Xp->dim);
     point *tmp2=createPoint(h->Xp->dim);
@@ -274,19 +316,19 @@ void mainHuller(huller* h, samples* s){
         pointAdd(tmp,tmp2);
     }
     pointCopy(h->Xn,tmp);
-    //funktion ausgeben
-    //fprintf(stderr,"\ny(x)=(");
-    //prettyPrint(h->Xp);
-    //fprintf(stderr,"-");
-    //prettyPrint(h->Xn);
-    //fprintf(stderr,"x+%lf-%lf)/2\n",h->XnXn,h->XpXp);
     destroyPoint(tmp);
     destroyPoint(tmp2);
     alphaStats(s);
 
 }
-
-
+//testen ob sich XpXp und XnXn signifikant geändert haben
+int xpxnChanged(huller *h,double oldxpxp, double oldxnxn){
+    if( (fabs(h->XpXp-oldxpxp)<=EPSILON) && (fabs(h->XnXn-oldxnxn)<=EPSILON) ){
+        return 0;    //Änderung XpXp und XnXn <EPSILON, nichts hat sich geändert.
+    }else{
+    return 1;   //sonst hat sich was geändert
+    }
+}
 
 
 
